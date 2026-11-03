@@ -12,7 +12,7 @@ let block = Block::default()
 
 let the_stuff = Paragraph::new("the stuff from the documentations")
     .block(block)
-    .centered();
+    .left_aligned();
 
     frame.render_widget(the_stuff, frame.area());
 }
