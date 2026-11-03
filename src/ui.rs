@@ -1,4 +1,4 @@
-use ratatui::widgets::{Block, Borders, Paragraph};
+use ratatui::widgets::{Block, Borders, Paragraph, Scrollbar, ScrollbarOrientation, ScrollbarState};
 use ratatui::style::{Color, Style, Stylize};
 use ratatui::Frame;
 

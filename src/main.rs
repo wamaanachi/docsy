@@ -1,4 +1,5 @@
 mod ui;
+mod app;
 
 fn main() -> std::io::Result<()> {
     ratatui::run(|terminal|{
