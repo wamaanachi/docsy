@@ -4,7 +4,7 @@ use ratatui::Frame;
 
 // will use https://ratatui.rs/ for studying stuff for this project 
 
-pub fn draw(frame:&mut ratatui::Frame<'_>){
+pub fn draw(frame:&mut ratatui::Frame<'_>, scroll: u16){
 let block = Block::default()
     .title("docsy")
     .borders(Borders::ALL)
@@ -12,7 +12,8 @@ let block = Block::default()
 
 let the_stuff = Paragraph::new("the stuff from the documentations")
     .block(block)
-    .left_aligned();
+    .left_aligned()
+    .scroll((scroll, 0));
 
     frame.render_widget(the_stuff, frame.area());
 }
