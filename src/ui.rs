@@ -11,7 +11,6 @@ let block = Block::default()
     .border_style(Style::default().fg(Color::Cyan));
 
 let the_stuff = Paragraph::new("the stuff from the documentations")
-    .block(block)
     .left_aligned()
     .scroll((scroll, 0));
 
