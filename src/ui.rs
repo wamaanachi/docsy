@@ -6,7 +6,7 @@ use crate::search;
 
 // will use https://ratatui.rs/ for studying stuff for this project 
 
-pub fn draw(frame:&mut ratatui::Frame<'_>, scroll: u16){
+pub fn draw(frame:&mut ratatui::Frame<'_>, app: &App){
     // ok so this is just to print out some random text
 let some_random_text = (1..=60)
     .map(|i| format!("line {i}: stuff from documentation"))
@@ -15,7 +15,9 @@ let some_random_text = (1..=60)
 
     let the_stuff = Paragraph::new(some_random_text)
         .left_aligned()
-        .scroll((scroll, 0));
+        .scroll((app.scroll, 0));
 
     frame.render_widget(the_stuff, frame.area());
+
+    search::draw_search(frame, app);
 }

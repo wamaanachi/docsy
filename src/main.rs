@@ -1,5 +1,6 @@
 mod ui;
 mod app;
+mod search;
 
 fn main() -> std::io::Result<()> {
 
@@ -7,7 +8,7 @@ fn main() -> std::io::Result<()> {
 
     ratatui::run(|terminal|{
         loop {
-        terminal.draw(|frame| ui::draw(frame, app.scroll))?;
+        terminal.draw(|frame| ui::draw(frame, &app))?;
 
         if let crossterm::event::Event::Key(key) = crossterm::event::read()?{
             if app.handle_key(key.code){
