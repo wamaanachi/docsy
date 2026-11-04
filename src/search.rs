@@ -15,8 +15,7 @@ pub fn draw_search(frame: &mut Frame<'_>, app: &App){
     }
 
     let popup = Popup::new(format!("{}_", app.input))
-        .title("Search")
-        .style(Style::new().fg(Color::White).on_blue());
+        .title("Search");
 
     frame.render_widget(popup, frame.area());
 }
