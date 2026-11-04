@@ -1,6 +1,7 @@
 use ratatui::widgets::{Block, Borders, Paragraph};
 use ratatui::style::{Color, Style, Stylize};
 use ratatui::Frame;
+use ratatui::layout::{Constraint, Layout};
 
 // will use https://ratatui.rs/ for studying stuff for this project 
 
