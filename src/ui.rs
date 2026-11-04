@@ -1,7 +1,8 @@
-use ratatui::widgets::{Block, Borders, Paragraph};
-use ratatui::style::{Color, Style, Stylize};
+use ratatui::widgets::Paragraph;
 use ratatui::Frame;
-use ratatui::layout::{Constraint, Layout};
+
+use crate::app::App;
+use crate::search;
 
 // will use https://ratatui.rs/ for studying stuff for this project 
 
