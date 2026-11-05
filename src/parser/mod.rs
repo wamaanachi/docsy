@@ -49,6 +49,22 @@ pub fn extract_kind_and_name(html: &str) -> Option<(ItemKind, String)> {
     Some((kind, name.trim().to_string()))
 }
 
+pub fn extract_mod_path(html: &str) -> Option<String> {
+    let frag = Html::parse_fragment(html);
+    let bread_selector = Selector::parse(".rustdoc-breadcrumbs a").ok()?;
+
+    let parts: Vec<String> = frag
+        .select(&bread_selector)
+        .map(|el| el.text().collect::<String>().trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect();
+
+    if parts.is_empty() {
+        None
+    } else {
+        Some(parts.join("::"))
+    }
+}
 #[cfg(test)]
 mod test {
 
@@ -88,5 +104,20 @@ mod test {
 
         assert_eq!(kind, ItemKind::Struct);
         assert_eq!(name, "DirBuilder");
+    }
+
+    #[test]
+    fn test_extract_breadcrumb() {
+        let html = r##"
+        <div class="main-heading">
+            <div id="sidebar-button"><a href="../../tokio/all.html" title="show sidebar"></a></div>
+            <div class="rustdoc-breadcrumbs"><a href="../index.html">tokio</a>::<wbr><a href="index.html">fs</a></div>
+            <h1>Struct <span class="struct">DirBuilder</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1>
+        </div>
+        "##;
+
+        let path = extract_mod_path(html);
+
+        assert_eq!(path, Some("tokio::fs".to_string()));
     }
 }
