@@ -1,4 +1,4 @@
-use std::process::Command;
+use std::process::{exit, Command, ExitCode, ExitStatus};
 use clap::Parser;
 use crate::cli::{CliArgs, SubCommand};
 
@@ -37,7 +37,7 @@ pub(crate) fn parse() {
                 "Parse this query or do smth else, change or remove this whole thing.\n Query: {query}"
             )
         }
-        SubCommand::Generate { dir } => {
+        SubCommand::Generate { path: dir } => {
             generate_docs(dir)
         }
     }
@@ -45,16 +45,20 @@ pub(crate) fn parse() {
 
 
 fn generate_docs(dir: Option<String>) {
+    let status: ExitStatus;
     if dir.is_some() {
-        Command::new("cargo")
+        status = Command::new("cargo")
             .arg("doc")
             .current_dir(dir.unwrap())
             .status()
             .expect("Something went wrong");
     } else {
-        Command::new("cargo")
+        status = Command::new("cargo")
             .arg("doc")
             .status()
             .expect("Something went wrong");
+    }
+    if !status.success() {
+        exit(status.code().unwrap_or(1));
     }
 }
