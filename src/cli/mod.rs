@@ -36,6 +36,8 @@ pub(crate) enum SubCommand {
 
     /// Runs cargo doc in the current directory
     Generate {
-        dir: Option<String>,
+        /// Path from terminal dir, or use full path starting from root
+        /// path = "/home/user/Projects/..." or "C:\..."
+        path: Option<String>,
     }
 }
