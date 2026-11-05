@@ -1,10 +1,10 @@
 use std::path::PathBuf;
-
+use clap::ValueEnum;
 use serde::{Deserialize, Serialize};
 
 /// This enum holds type of a symbol
 /// Wam can use this to color code different symbols
-#[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
+#[derive(Clone, Copy, Serialize, Deserialize, ValueEnum, PartialEq, Eq, Hash, Debug)]
 pub enum ItemKind {
     Module,
     Struct,
