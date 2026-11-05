@@ -1,4 +1,3 @@
-use std::arch::x86_64::__get_cpuid_max;
 use std::process::Command;
 use clap::Parser;
 use crate::cli::{CliArgs, SubCommand};
@@ -35,7 +34,7 @@ pub(crate) fn parse() {
         }
         SubCommand::Search { query } => {
             todo!(
-                "Parse this query or do smth else, change or remove this whole thing"
+                "Parse this query or do smth else, change or remove this whole thing.\n Query: {query}"
             )
         }
         SubCommand::Generate { dir } => {
