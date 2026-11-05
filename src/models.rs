@@ -1,4 +1,3 @@
-use std::fmt::Display;
 use std::path::PathBuf;
 use clap::ValueEnum;
 use serde::{Deserialize, Serialize};
