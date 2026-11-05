@@ -1,6 +1,8 @@
+use std::fmt::Display;
 use std::path::PathBuf;
 use clap::ValueEnum;
 use serde::{Deserialize, Serialize};
+use crate::models::ItemKind::Module;
 
 /// This enum holds type of a symbol
 /// Wam can use this to color code different symbols

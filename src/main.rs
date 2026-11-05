@@ -1,4 +1,3 @@
-use std::process::Command;
 use crate::cli::parse::parse;
 
 pub mod cli;

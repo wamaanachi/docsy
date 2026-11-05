@@ -12,19 +12,30 @@ pub(crate) fn parse() {
         SubCommand::Get { all, item, name } => {
             if all {
                 todo!(
-                    "Print all instances of item from doc"
+                    "Print all instances of item from doc [Args received: All = {all}, ItemKind = {:?}", item
+                )
+            } else {
+                todo!(
+                    "Print all instances of item from doc [Args received: All = {all}, ItemKind = {:?}, name = {}", item, name.unwrap().to_lowercase()
                 )
             }
-
         }
         SubCommand::List => {
             todo!(
                 "Wire this to print every instance of every thing in the doc"
             )
+
+            // Like this:
+            //
+            // Struct:
+            //   - SearchResult
+            //   - DocItem
+            // Enum:
+            //   - ItemKind
         }
         SubCommand::Search { query } => {
             todo!(
-                "Parse this query or do smth else, change or remove this wwhole thing"
+                "Parse this query or do smth else, change or remove this whole thing"
             )
         }
         SubCommand::Generate { dir } => {
