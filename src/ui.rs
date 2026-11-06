@@ -1,4 +1,4 @@
-use ratatui::widgets::{Paragraph, Block, Borders};
+use ratatui::widgets::Paragraph;
 use ratatui::Frame;
 
 use crate::app::App;
@@ -27,13 +27,9 @@ let some_random_text = (1..=60)
 
     let the_stuff = Paragraph::new(some_random_text)
         .left_aligned()
-        .scroll((app.scroll, 0))
-        .block(
-            Block::new()
-                .borders(Borders::BOTTOM)
-                .title_bottom("j/k scroll | / search | s view | q quit"),
-        );
+        .scroll((app.scroll, 0));
 
     frame.render_widget(the_stuff, frame.area());
 
 }
+
