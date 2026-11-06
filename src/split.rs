@@ -1,8 +1,18 @@
 use ratatui::layout::{Constraint, Layout};
+use ratatui::style::{Color, Style};
 use ratatui::widgets::{Block, List, Paragraph};
 use ratatui::Frame;
 
-use crate::app::App;
+use crate::app::{App, Focus};
+
+fn border_style(focused: bool) -> Style {
+    if focused {
+        Style::new().fg(Color::Cyan)
+    }
+    else {
+        Style::new().fg(Color::DarkGray)
+    }
+}
 
 pub fn draw_split(frame: &mut Frame<'_>, app: &App){
     let areas = Layout::horizontal([
@@ -16,7 +26,11 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
         "DocItem",
         "ItemKind",
     ])
-    .block(Block::bordered().title("Results"));
+    .block(
+        Block::bordered()
+        .title("Results")
+        .border_style(border_style(app.focus == Focus::Results)),
+    );
 
     frame.render_widget(results, areas[0]);
 
@@ -29,8 +43,11 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
         .join("\n");
 
     let document = Paragraph::new(text) 
-    .block(Block::bordered().title("docs"))
-    .scroll((app.scroll, 0));
+    .block(
+        Block::bordered()
+            .title("docs")
+            .border_style(border_style(app.focus == Focus::Document)),)
+            .scroll((app.scroll, 0));
 
     frame.render_widget(document, areas[1]);
 

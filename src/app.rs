@@ -1,10 +1,17 @@
 use crossterm::event::KeyCode;
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum Focus {
+    Results,
+    Document,
+}
+
 pub struct App {
     pub scroll: u16,
     pub searching: bool,
     pub input: String,
     pub split_view: bool,
+    pub focus: Focus,
 }
 
 impl App {
@@ -14,6 +21,7 @@ impl App {
             searching: false,
             input: String::new(),
             split_view: false,
+            focus: Focus::Results,
         }
     }
 
@@ -38,6 +46,12 @@ impl App {
         KeyCode::Down | KeyCode::Char('j') =>  self.scroll = self.scroll.saturating_add(1),
         // so this is gonna be temporary i think
         KeyCode::Char('s') => self.split_view = !self.split_view,
+        KeyCode::Tab => {
+            self.focus = match self.focus {
+                Focus::Results => Focus::Document,
+                Focus::Document => Focus::Results,
+            };
+        }
         KeyCode::Char('q') => return true,
             _ => {}
         }
