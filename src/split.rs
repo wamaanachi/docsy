@@ -29,6 +29,7 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
     .block(
         Block::bordered()
         .title("Results")
+        .title_bottom("Tab focus | s view")
         .border_style(border_style(app.focus == Focus::Results)),
     );
 
@@ -46,6 +47,7 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
     .block(
         Block::bordered()
             .title("docs")
+            .title_bottom("j/k scroll | Tab focus | / search | s view | q quit")
             .border_style(border_style(app.focus == Focus::Document)),)
             .scroll((app.scroll, 0));
 
