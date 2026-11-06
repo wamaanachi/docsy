@@ -9,7 +9,7 @@ use crate::split;
 
 pub fn draw(frame: &mut Frame<'_>, app: &App){
     if app.split_view {
-        split::draw_view(frame, app);
+        split::draw_split(frame, app);
     }
     else {
         draw_pager(frame, app);
