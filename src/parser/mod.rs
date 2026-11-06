@@ -65,6 +65,20 @@ pub fn extract_mod_path(html: &str) -> Option<String> {
         Some(parts.join("::"))
     }
 }
+
+pub fn extract_description(html: &str) -> Option<String> {
+    let frag = Html::parse_fragment(html);
+    let selector = Selector::parse("details.top-doc div.docblock > p").ok()?;
+
+    let text = frag
+        .select(&selector)
+        .map(|p| p.text().collect::<String>())
+        .collect::<Vec<String>>()
+        .join("\n\n");
+
+    Some(text.trim().to_string())
+}
+
 #[cfg(test)]
 mod test {
 
@@ -119,5 +133,22 @@ mod test {
         let path = extract_mod_path(html);
 
         assert_eq!(path, Some("tokio::fs".to_string()));
+    }
+
+    #[test]
+    fn test_extract_top_description() {
+        let html = r#"
+        <details class="toggle top-doc" open>
+            <div class="docblock">
+                <p>A builder for creating directories in various manners.</p>
+                <p>This is a specialized version of std::fs::DirBuilder.</p>
+            </div>
+        </details>
+        "#;
+
+        let desc = extract_description(html);
+
+        let expected = "A builder for creating directories in various manners.\n\nThis is a specialized version of std::fs::DirBuilder.".to_string();
+        assert_eq!(desc, Some(expected));
     }
 }
