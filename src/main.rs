@@ -7,6 +7,7 @@ mod split;
 
 pub mod cli;
 pub mod models;
+pub mod parser;
 
 fn main() -> std::io::Result<()> {
 
