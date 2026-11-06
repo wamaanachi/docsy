@@ -1,4 +1,5 @@
 use crate::cli::parse::parse;
+use crossterm::event::KeyEventKind;
 
 mod ui;
 mod app;
@@ -20,8 +21,11 @@ fn main() -> std::io::Result<()> {
         terminal.draw(|frame| ui::draw(frame, &app))?;
 
         if let crossterm::event::Event::Key(key) = crossterm::event::read()?{
+            if key.kind == KeyEventKind::Release {
+                continue;
+            }
             if app.handle_key(key.code){
-         break Ok(());   
+                break Ok(());
             }
         }   
     }
