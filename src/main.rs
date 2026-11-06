@@ -3,6 +3,8 @@ use crate::cli::parse::parse;
 mod ui;
 mod app;
 mod search;
+mod split;
+
 pub mod cli;
 pub mod models;
 
