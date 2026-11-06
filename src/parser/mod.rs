@@ -1,3 +1,5 @@
+use std::{io, path::Path};
+
 use scraper::{Html, Selector};
 
 use crate::models::{DocItem, ItemKind};
@@ -95,6 +97,13 @@ pub fn parse_doc_html(html: &str) -> Option<DocItem> {
         description,
         examples: Vec::new(),
     })
+}
+
+pub fn parse_doc_file(path: &Path) -> io::Result<DocItem> {
+    let html = std::fs::read_to_string(path).unwrap();
+
+    parse_doc_html(&html)
+        .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "Failed to parse rustdoc HTML"))
 }
 
 #[cfg(test)]
