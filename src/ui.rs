@@ -1,4 +1,4 @@
-use ratatui::widgets::Paragraph;
+use ratatui::widgets::{Paragraph, Wrap};
 use ratatui::Frame;
 
 use crate::app::App;
@@ -19,17 +19,19 @@ pub fn draw(frame: &mut Frame<'_>, app: &App){
 }
 
 fn draw_pager(frame: &mut ratatui::Frame<'_>, app: &App){
-    // ok so this is just to print out some random text
-let some_random_text = (1..=60)
-    .map(|i| format!("line {i}: stuff from documentation"))
-    .collect::<Vec<_>>()
-    .join("\n");
+
+    // this the same stuff i did with the split layout
+let some_random_text = app
+    .docs
+    .get(app.selected)
+    .map(|doc| format!("{}\n\n{}", doc.declaration, doc.description))
+    .unwrap_or_default();
 
     let the_stuff = Paragraph::new(some_random_text)
         .left_aligned()
-        .scroll((app.scroll, 0));
+        .scroll((app.scroll, 0))
+        .wrap(Wrap {trim: true});
 
     frame.render_widget(the_stuff, frame.area());
 
 }
-
