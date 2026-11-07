@@ -1,8 +1,8 @@
 use std::{io, path::Path};
 
-use scraper::{Html, Selector};
+use scraper::{ElementRef, Html, Selector};
 
-use crate::models::{DocBlock, DocItem, ItemKind};
+use crate::models::{DocBlock, DocItem, ItemKind, MethodItem};
 
 /// extracts the signature of the said thingy from HTML file
 pub fn extract_decl(html: &str) -> Option<String> {
@@ -76,19 +76,20 @@ pub fn extract_mod_path(html: &str) -> Option<String> {
 ///extracts top-level descriptions
 pub fn extract_docblock(html: &str) -> Vec<DocBlock> {
     let frag = Html::parse_fragment(html);
-    let selector = Selector::parse(
-        "details.top-doc div.docblock > p, \
-            details.top-doc div.docblock > h1, \
-            details.top-doc div.docblock > h2, \
-            details.top-doc div.docblock > h3, \
-            details.top-doc div.docblock > h4, \
-            details.top-doc div.docblock > h5, \
-            details.top-doc div.docblock > h6, \
-            details.top-doc div.docblock div.example-wrap pre",
-    )
-    .unwrap();
+    let selector = Selector::parse("details.top-doc div.docblock").unwrap();
 
-    frag.select(&selector)
+    let Some(docblock) = frag.select(&selector).next() else {
+        return Vec::new();
+    };
+
+    parse_docblock_element(docblock)
+}
+
+fn parse_docblock_element(docblock: ElementRef) -> Vec<DocBlock> {
+    let selector = Selector::parse("p, h1, h2, h3, h4, h5, h6, div.example-wrap pre").unwrap();
+
+    docblock
+        .select(&selector)
         .filter_map(|e| {
             let text = e.text().collect::<String>().trim().to_string();
             if text.is_empty() {
@@ -111,6 +112,44 @@ pub fn extract_docblock(html: &str) -> Vec<DocBlock> {
             }
         })
         .collect()
+}
+
+pub fn extract_method(html: &str) -> Vec<MethodItem> {
+    let frag = Html::parse_fragment(html);
+    let method_selector = Selector::parse(
+    "#implementations-list details.method-toggle, div[id*='deref-methods'] details.method-toggle").unwrap();
+
+    let sig_selector = Selector::parse("h4.code-header").unwrap();
+    let name_selector = Selector::parse("h4.code-header a.fn").unwrap();
+    let description_selector = Selector::parse("h4.code-header a.fn").unwrap();
+
+    let mut methods = Vec::new();
+
+    for toggle in frag.select(&method_selector) {
+        let Some(sig) = toggle.select(&sig_selector).next() else {
+            continue;
+        };
+
+        let Some(name) = toggle.select(&name_selector).next() else {
+            continue;
+        };
+
+        let sig_text = sig.text().collect::<Vec<_>>().join(" ").trim().to_string();
+        let name_text = name.text().collect::<String>().trim().to_string();
+
+        let description = if let Some(doc_elem) = toggle.select(&description_selector).next() {
+            parse_docblock_element(doc_elem)
+        } else {
+            Vec::new()
+        };
+
+        methods.push(MethodItem {
+            name: name_text,
+            signature: sig_text,
+            description,
+        });
+    }
+    methods
 }
 
 pub fn parse_doc_html(html: &str) -> Option<DocItem> {
