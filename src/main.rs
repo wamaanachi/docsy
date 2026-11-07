@@ -5,6 +5,7 @@ mod ui;
 mod app;
 mod search;
 mod split;
+mod docs;
 
 pub mod cli;
 pub mod models;

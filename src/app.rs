@@ -85,5 +85,3 @@ impl App {
     }
 }
 
-git add .
-git commit -m "the doc title changes depending on what you chose"
