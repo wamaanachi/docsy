@@ -47,6 +47,7 @@ impl App {
         KeyCode::Up | KeyCode::Char('k') => {
             if self.split_view && self.focus == Focus::Results {
                 self.selected = self.selected.saturating_sub(1);
+                self.scroll = 0;
             }
             else {
                 self.scroll = self.scroll.saturating_sub(1);
@@ -56,6 +57,7 @@ impl App {
             KeyCode::Down | KeyCode::Char('j') => {
                 if self.split_view && self.focus == Focus::Results {
                     self.selected = (self.selected + 1).min(2);
+                    self.scroll = 0;
                 }
                 else {
                     self.scroll = self.scroll.saturating_add(1);
@@ -83,3 +85,5 @@ impl App {
     }
 }
 
+git add .
+git commit -m "the doc title changes depending on what you chose"

@@ -38,6 +38,8 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
 
     let count = items.len();
 
+    let doc_title = items.get(selected).copied().unwrap_or("");
+
     let results = List::new(items)
         .block(
             Block::bordered()
@@ -62,7 +64,7 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
     let document = Paragraph::new(text) 
     .block(
         Block::bordered()
-            .title("docs")
+            .title(format!(" {} ", doc_title))
             .border_style(border_style(app.focus == Focus::Document)),)
             .scroll((app.scroll, 0));
 
