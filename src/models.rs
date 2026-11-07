@@ -4,6 +4,7 @@ use std::path::PathBuf;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum DocBlock {
+    Heading(String),
     Paragraph(String),
     Code(String),
 }

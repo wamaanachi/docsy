@@ -73,11 +73,18 @@ pub fn extract_mod_path(html: &str) -> Option<String> {
     }
 }
 
-//extracts top-level descriptions
+///extracts top-level descriptions
 pub fn extract_docblock(html: &str) -> Vec<DocBlock> {
     let frag = Html::parse_fragment(html);
     let selector = Selector::parse(
-        "details.top-doc div.docblock > p, details.top-doc div.docblock div.example-wrap pre",
+        "details.top-doc div.docblock > p, \
+            details.top-doc div.docblock > h1, \
+            details.top-doc div.docblock > h2, \
+            details.top-doc div.docblock > h3, \
+            details.top-doc div.docblock > h4, \
+            details.top-doc div.docblock > h5, \
+            details.top-doc div.docblock > h6, \
+            details.top-doc div.docblock div.example-wrap pre",
     )
     .unwrap();
 
@@ -89,6 +96,15 @@ pub fn extract_docblock(html: &str) -> Vec<DocBlock> {
             }
 
             match e.value().name() {
+                "h1" | "h2" | "h3" | "h4" | "h5" | "h6" => {
+                    let raw = text.replace("§", "");
+                    let clean = raw.trim().to_string();
+                    if !clean.is_empty() {
+                        Some(DocBlock::Heading(clean))
+                    } else {
+                        None
+                    }
+                }
                 "p" => Some(DocBlock::Paragraph(text)),
                 "pre" => Some(DocBlock::Code(text)),
                 _ => None,
