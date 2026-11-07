@@ -23,6 +23,12 @@ pub enum ItemKind {
     Constant,
     Other,
 }
+#[derive(Clone, Serialize, Deserialize, PartialEq, Eq, Debug)]
+pub struct MethodItem {
+    pub name: String,
+    pub signature: String,
+    pub description: Vec<DocBlock>,
+}
 
 /// This is a lightweight search return for Search List and sidebar
 #[derive(Clone, Serialize, Deserialize, PartialEq, Eq, Debug)]
