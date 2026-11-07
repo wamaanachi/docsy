@@ -1,4 +1,4 @@
-use std::process::{exit, Command, ExitCode, ExitStatus};
+use std::process::{exit, Command, ExitStatus};
 use clap::Parser;
 use crate::cli::{CliArgs, SubCommand};
 
