@@ -15,11 +15,15 @@ fn border_style(focused: bool) -> Style {
 }
 
 pub fn draw_split(frame: &mut Frame<'_>, app: &App){
+
+    let rows = Layout::vertical([Constraint::Min(0), Constraint::Length(1)])
+    .split(frame.area());
+
     let areas = Layout::horizontal([
         Constraint::Percentage(30),
         Constraint::Percentage(70),
     ])
-    .split(frame.area());
+    .split(rows[0]);
 
     let query = app.input.to_lowercase();
 
@@ -36,7 +40,6 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
         .block(
             Block::bordered()
                 .title("Results")
-                .title_bottom("Tab focus | s view")
                 .border_style(border_style(app.focus == Focus::Results)),
         )
         .highlight_style(Style::new().bg(Color::Cyan).fg(Color::Black));
@@ -58,11 +61,13 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
     .block(
         Block::bordered()
             .title("docs")
-            .title_bottom("j/k scroll | Tab focus | / search | s view | q quit")
             .border_style(border_style(app.focus == Focus::Document)),)
             .scroll((app.scroll, 0));
 
     
     frame.render_widget(document, areas[1]);
 
+    let footer = Paragraph::new(" Tab switch  / filter  j/k scroll  s view  q quit");
+    frame.render_widget(footer, rows[1]);
 }
+
