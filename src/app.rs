@@ -1,4 +1,5 @@
 use crossterm::event::KeyCode;
+use crate::models::DocItem;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Focus {
@@ -13,6 +14,7 @@ pub struct App {
     pub split_view: bool,
     pub focus: Focus,
     pub selected: usize,
+    pub docs: Vec<DocItem>,
 }
 
 impl App {
@@ -24,6 +26,7 @@ impl App {
             split_view: false,
             focus: Focus::Results,
             selected: 0,
+            docs: crate::docs::load(std::path::Path::new("target/doc/manr")),
         }
     }
 
@@ -56,7 +59,7 @@ impl App {
         
             KeyCode::Down | KeyCode::Char('j') => {
                 if self.split_view && self.focus == Focus::Results {
-                    self.selected = (self.selected + 1).min(2);
+                    self.selected = (self.selected + 1).min(self.docs.len().saturating_sub(1));
                     self.scroll = 0;
                 }
                 else {
@@ -84,4 +87,3 @@ impl App {
         false
     }
 }
-

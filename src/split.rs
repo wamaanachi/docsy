@@ -4,6 +4,7 @@ use ratatui::widgets::{Block, List, Paragraph, ListState};
 use ratatui::Frame;
 
 use crate::app::{App, Focus};
+use crate::models::DocItem;
 
 fn border_style(focused: bool) -> Style {
     if focused {
@@ -25,25 +26,27 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
     ])
     .split(rows[0]);
 
-    let query = app.input.to_lowercase();
+   // removed the hardcoded 3 things so i can wire up chish's parser
+   // should work now
 
-    // turned into a vector cause it is easy like this
-    // and this is so that the search thing actually works
-    // and umm used some docs for this code
-    let items: Vec<&str> = ["SearchResult", "DocItem", "ItemKind"]
-        .into_iter()
-        .filter(|item| item.to_lowercase().contains(query.as_str()))
+   let query = app.input.to_lowercase();
+
+   let docs: Vec<&DocItem>  = app.docs
+        .iter()
+        .filter(|doc| doc.name.to_lowercase().contains(query.as_str()))
         .collect();
-    let selected = app.selected.min(items.len().saturating_sub(1));
+    let selected = app.selected.min(docs.len().saturating_sub(1));
 
-    let count = items.len();
+    let doc = docs.get(selected);
+    let doc_title = doc
+        .map(|doc| format!(" {} ", doc.path))
+        .unwrap_or_else(|| " docs ".to_string());
 
-    let doc_title = items.get(selected).copied().unwrap_or("");
 
-    let results = List::new(items)
+    let results = List::new(docs.iter().map(|doc| doc.name.as_str()))
         .block(
             Block::bordered()
-                .title(format!(" Index ({})", count))
+                .title(format!(" Index ({})", docs.len()))
                 .border_style(border_style(app.focus == Focus::Results)),
         )
         .highlight_style(Style::new().bg(Color::Cyan).fg(Color::Black));
@@ -56,15 +59,14 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
     // this is the thing i had in the pager too, i could i have imported and stuff ig
     //but that'd make things unnecesarily complicated
 
-    let text = (1..=20)
-        .map(|i| format!("line {i}: stuff from documentation"))
-        .collect::<Vec<_>>()
-        .join("\n");
+    let text = doc
+        .map(|doc| format!("{}\n\n{}", doc.declaration, doc.description))
+        .unwrap_or_default();
 
     let document = Paragraph::new(text) 
     .block(
         Block::bordered()
-            .title(format!(" {} ", doc_title))
+            .title(doc_title)
             .border_style(border_style(app.focus == Focus::Document)),)
             .scroll((app.scroll, 0));
 
