@@ -121,7 +121,7 @@ pub fn extract_method(html: &str) -> Vec<MethodItem> {
 
     let sig_selector = Selector::parse("h4.code-header").unwrap();
     let name_selector = Selector::parse("h4.code-header a.fn").unwrap();
-    let description_selector = Selector::parse("h4.code-header a.fn").unwrap();
+    let description_selector = Selector::parse(".docblock").unwrap();
 
     let mut methods = Vec::new();
 
@@ -130,12 +130,16 @@ pub fn extract_method(html: &str) -> Vec<MethodItem> {
             continue;
         };
 
-        let Some(name) = toggle.select(&name_selector).next() else {
+        let Some(name_elem) = toggle.select(&name_selector).next() else {
             continue;
         };
 
-        let sig_text = sig.text().collect::<Vec<_>>().join(" ").trim().to_string();
-        let name_text = name.text().collect::<String>().trim().to_string();
+        let raw_signature = sig.text().collect::<String>().trim().to_string();
+        let signature = raw_signature
+            .split_whitespace()
+            .collect::<Vec<_>>()
+            .join(" ");
+        let name = name_elem.text().collect::<String>().trim().to_string();
 
         let description = if let Some(doc_elem) = toggle.select(&description_selector).next() {
             parse_docblock_element(doc_elem)
@@ -144,8 +148,8 @@ pub fn extract_method(html: &str) -> Vec<MethodItem> {
         };
 
         methods.push(MethodItem {
-            name: name_text,
-            signature: sig_text,
+            name,
+            signature,
             description,
         });
     }
@@ -282,5 +286,46 @@ mod test {
         assert_eq!(parsed_doc.kind, ItemKind::Struct);
         assert_eq!(parsed_doc.path, "tokio::fs::DirBuilder");
         assert!(!parsed_doc.description.is_empty());
+    }
+
+    #[test]
+    fn test_extract_methods() {
+        let html = r##"<div id="implementations-list"><details class="toggle method-toggle" open=""><summary><section id="method.new" class="method"><a class="src rightside" href="../../src/tokio/fs/dir_builder.rs.html#33-35">Source</a><h4 class="code-header">pub fn <a href="#method.new" class="fn">new</a>() -&gt; Self</h4></section></summary><div class="docblock"><p>Creates a new set of options with default mode/security settings for all
+platforms and also non-recursive.</p>
+<p>This is an async version of <a href="https://doc.rust-lang.org/nightly/std/fs/struct.DirBuilder.html#method.new" title="associated function std::fs::DirBuilder::new"><code>std::fs::DirBuilder::new</code></a>.</p>
+<h5 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>tokio::fs::DirBuilder;
+
+<span class="kw">let </span>builder = DirBuilder::new();</code></pre><div class="button-holder"><button class="copy-button" title="Copy code to clipboard"></button></div></div></div></details><details class="toggle method-toggle" open=""><summary><section id="method.recursive" class="method"><a class="src rightside" href="../../src/tokio/fs/dir_builder.rs.html#52-55">Source</a><h4 class="code-header">pub fn <a href="#method.recursive" class="fn">recursive</a>(&amp;mut self, recursive: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>) -&gt; &amp;mut Self</h4></section></summary><div class="docblock"><p>Indicates whether to create directories recursively (including all parent directories).
+Parents that do not exist are created with the same security and permissions settings.</p>
+<p>This option defaults to <code>false</code>.</p>
+<p>This is an async version of <a href="https://doc.rust-lang.org/nightly/std/fs/struct.DirBuilder.html#method.recursive" title="method std::fs::DirBuilder::recursive"><code>std::fs::DirBuilder::recursive</code></a>.</p>
+<h5 id="examples-1"><a class="doc-anchor" href="#examples-1">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>tokio::fs::DirBuilder;
+
+<span class="kw">let </span><span class="kw-2">mut </span>builder = DirBuilder::new();
+builder.recursive(<span class="bool-val">true</span>);</code></pre><div class="button-holder"><button class="copy-button" title="Copy code to clipboard"></button></div></div></div></details></div>"##;
+
+        let methods = extract_method(html);
+        assert_eq!(methods.len(), 2);
+
+        assert_eq!(methods[0].name, "new");
+        assert_eq!(methods[1].name, "recursive");
+        assert_eq!(methods[0].signature, "pub fn new() -> Self".to_string());
+        assert_eq!(
+            methods[1].signature,
+            "pub fn recursive(&mut self, recursive: bool) -> &mut Self".to_string()
+        );
+        // Sorry I used AI to generate structure for this test :sob: I don't wanna parse HTML to Vec
+        // in my brain :hs:
+        assert_eq!(
+          methods[0].description,
+            vec![
+                DocBlock::Paragraph("Creates a new set of options with default mode/security settings for all\nplatforms and also non-recursive.".to_string()),
+                DocBlock::Paragraph("This is an async version of std::fs::DirBuilder::new.".to_string()),
+                DocBlock::Heading("Examples".to_string()),
+                DocBlock::Code("use tokio::fs::DirBuilder;\n\nlet builder = DirBuilder::new();".to_string()),
+            ]
+        );
     }
 }
