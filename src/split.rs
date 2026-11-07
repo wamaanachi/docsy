@@ -1,6 +1,6 @@
 use ratatui::layout::{Constraint, Layout};
 use ratatui::style::{Color, Style};
-use ratatui::widgets::{Block, List, Paragraph};
+use ratatui::widgets::{Block, List, Paragraph, ListState};
 use ratatui::Frame;
 
 use crate::app::{App, Focus};
@@ -31,9 +31,12 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
         .title("Results")
         .title_bottom("Tab focus | s view")
         .border_style(border_style(app.focus == Focus::Results)),
-    );
+    )
+    .highlight_style(Style::new().bg(Color::Cyan).fg(Color::Black));
 
-    frame.render_widget(results, areas[0]);
+    let mut state = ListState::default().with_selected(Some(app.selected));
+
+    frame.render_stateful_widget(results, areas[0], &mut state);
 
     // this is the thing i had in the pager too, i could i have imported and stuff ig
     //but that'd make things unnecesarily complicated
@@ -51,6 +54,7 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
             .border_style(border_style(app.focus == Focus::Document)),)
             .scroll((app.scroll, 0));
 
+    
     frame.render_widget(document, areas[1]);
 
 }

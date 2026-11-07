@@ -60,6 +60,7 @@ impl App {
                 else {
                     self.scroll = self.scroll.saturating_add(1);
                 }
+            }
             
         
         KeyCode::Char('s') => self.split_view = !self.split_view,
