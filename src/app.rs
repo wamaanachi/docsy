@@ -70,6 +70,12 @@ impl App {
                 Focus::Document => Focus::Results,
             };
         }
+
+        KeyCode::Enter => {
+            if self.split_view && self.focus == Focus::Results {
+                self.focus = Focus::Document;
+            }
+        }
         KeyCode::Char('q') => return true,
             _ => {}
         }

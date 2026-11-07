@@ -30,16 +30,18 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
     // turned into a vector cause it is easy like this
     // and this is so that the search thing actually works
     // and umm used some docs for this code
-    let items: Vec<&str> = ["SearchResults", "DocItem", "ItemKind"]
+    let items: Vec<&str> = ["SearchResult", "DocItem", "ItemKind"]
         .into_iter()
         .filter(|item| item.to_lowercase().contains(query.as_str()))
         .collect();
     let selected = app.selected.min(items.len().saturating_sub(1));
 
+    let count = items.len();
+
     let results = List::new(items)
         .block(
             Block::bordered()
-                .title("Results")
+                .title(format!(" Index ({})", count))
                 .border_style(border_style(app.focus == Focus::Results)),
         )
         .highlight_style(Style::new().bg(Color::Cyan).fg(Color::Black));
@@ -70,4 +72,3 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
     let footer = Paragraph::new(" Tab switch  / filter  j/k scroll  s view  q quit");
     frame.render_widget(footer, rows[1]);
 }
-
