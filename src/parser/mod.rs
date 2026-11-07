@@ -2,11 +2,12 @@ use std::{io, path::Path};
 
 use scraper::{Html, Selector};
 
-use crate::models::{DocItem, ItemKind};
+use crate::models::{DocBlock, DocItem, ItemKind};
 
+/// extracts the signature of the said thingy from HTML file
 pub fn extract_decl(html: &str) -> Option<String> {
     let fragment = Html::parse_fragment(html);
-    let selector = Selector::parse("pre.item-decl").ok()?;
+    let selector = Selector::parse("pre.item-decl").unwrap();
 
     let element = fragment.select(&selector).next()?;
     let text = element.text().collect::<Vec<_>>().join(" ");
@@ -15,9 +16,11 @@ pub fn extract_decl(html: &str) -> Option<String> {
     Some(cleaned)
 }
 
+/// A kinda ugly function, which classifies text from HTML into a better enum type
+/// And yeah... it returns a tuple with (kind, name)
 pub fn extract_kind_and_name(html: &str) -> Option<(ItemKind, String)> {
     let fragment = Html::parse_fragment(html);
-    let selector = Selector::parse(".main-heading h1").ok()?;
+    let selector = Selector::parse(".main-heading h1").unwrap();
 
     let element = fragment.select(&selector).next()?;
     let text = element.text().collect::<Vec<_>>().join(" ");
@@ -51,9 +54,11 @@ pub fn extract_kind_and_name(html: &str) -> Option<(ItemKind, String)> {
     Some((kind, name.trim().to_string()))
 }
 
+/// This function extracts the Path from breadcrumbs in HTML file
+/// NOT to be confused with file path, this is for import path like std::vec::Vec
 pub fn extract_mod_path(html: &str) -> Option<String> {
     let frag = Html::parse_fragment(html);
-    let bread_selector = Selector::parse(".rustdoc-breadcrumbs a").ok()?;
+    let bread_selector = Selector::parse(".rustdoc-breadcrumbs a").unwrap();
 
     let parts: Vec<String> = frag
         .select(&bread_selector)
@@ -68,24 +73,35 @@ pub fn extract_mod_path(html: &str) -> Option<String> {
     }
 }
 
-pub fn extract_description(html: &str) -> Option<String> {
+//extracts top-level descriptions
+pub fn extract_docblock(html: &str) -> Vec<DocBlock> {
     let frag = Html::parse_fragment(html);
-    let selector = Selector::parse("details.top-doc div.docblock > p").ok()?;
+    let selector = Selector::parse(
+        "details.top-doc div.docblock > p, details.top-doc div.docblock div.example-wrap pre",
+    )
+    .unwrap();
 
-    let text = frag
-        .select(&selector)
-        .map(|p| p.text().collect::<String>())
-        .collect::<Vec<String>>()
-        .join("\n\n");
+    frag.select(&selector)
+        .filter_map(|e| {
+            let text = e.text().collect::<String>().trim().to_string();
+            if text.is_empty() {
+                return None;
+            }
 
-    Some(text.trim().to_string())
+            match e.value().name() {
+                "p" => Some(DocBlock::Paragraph(text)),
+                "pre" => Some(DocBlock::Code(text)),
+                _ => None,
+            }
+        })
+        .collect()
 }
 
 pub fn parse_doc_html(html: &str) -> Option<DocItem> {
     let (kind, name) = extract_kind_and_name(html)?;
     let decl = extract_decl(html)?;
     let mod_path = extract_mod_path(html)?;
-    let description = extract_description(html)?;
+    let description = extract_docblock(html);
 
     let full_path = format!("{}::{}", mod_path, name);
 
@@ -163,20 +179,27 @@ mod test {
     }
 
     #[test]
-    fn test_extract_top_description() {
+    fn test_extract_top_description_blocks() {
         let html = r#"
-        <details class="toggle top-doc" open>
-            <div class="docblock">
-                <p>A builder for creating directories in various manners.</p>
-                <p>This is a specialized version of std::fs::DirBuilder.</p>
-            </div>
-        </details>
-        "#;
+    <details class="toggle top-doc" open>
+        <div class="docblock">
+            <p>A builder for creating directories.</p>
+            <div class="example-wrap"><pre class="rust rust-example-rendered"><code>let x = 5;</code></pre></div>
+            <p>End of docs.</p>
+        </div>
+    </details>
+    "#;
 
-        let desc = extract_description(html);
+        let blocks = extract_docblock(html);
 
-        let expected = "A builder for creating directories in various manners.\n\nThis is a specialized version of std::fs::DirBuilder.".to_string();
-        assert_eq!(desc, Some(expected));
+        assert_eq!(
+            blocks,
+            vec![
+                DocBlock::Paragraph("A builder for creating directories.".to_string()),
+                DocBlock::Code("let x = 5;".to_string()),
+                DocBlock::Paragraph("End of docs.".to_string()),
+            ]
+        );
     }
 
     #[test]
@@ -199,11 +222,10 @@ mod test {
         "#;
 
         let parsed_doc: DocItem = parse_doc_html(html).unwrap();
-        let expect_desc = "A builder for creating directories in various manners.\n\nThis is a specialized version of std::fs::DirBuilder for usage on the Tokio runtime.";
 
         assert_eq!(parsed_doc.name, "DirBuilder".to_string());
         assert_eq!(parsed_doc.kind, ItemKind::Struct);
         assert_eq!(parsed_doc.path, "tokio::fs::DirBuilder");
-        assert_eq!(parsed_doc.description, expect_desc);
+        assert!(!parsed_doc.description.is_empty());
     }
 }

@@ -1,6 +1,12 @@
-use std::path::PathBuf;
 use clap::ValueEnum;
 use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum DocBlock {
+    Paragraph(String),
+    Code(String),
+}
 
 /// This enum holds type of a symbol
 /// Wam can use this to color code different symbols
@@ -39,7 +45,7 @@ pub struct DocItem {
     //The code declaration signature like pub struct Vec<T>
     pub declaration: String,
     //The real stuff
-    pub description: String,
+    pub description: Vec<DocBlock>,
     //Any code examples that might get extracted from docs
     pub examples: Vec<String>,
 }
