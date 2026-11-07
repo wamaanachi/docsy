@@ -24,6 +24,8 @@ pub(crate) enum SubCommand {
         item: ItemKind,
         #[arg(required_unless_present = "all")]
         name: Option<String>,
+        #[arg(long="crate")]
+        package: Option<String>,
     },
 
     /// Lists all things in the program

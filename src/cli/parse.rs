@@ -2,20 +2,24 @@ use std::process::{exit, Command, ExitCode, ExitStatus};
 use clap::Parser;
 use crate::cli::{CliArgs, SubCommand};
 
+
 pub(crate) fn parse() {
     let args = CliArgs::parse();
 
     let command = args.command;
 
     match command {
-        SubCommand::Get { all, item, name } => {
+        SubCommand::Get { all, item, name, package } => {
             if all {
                 todo!(
-                    "Print all instances of item from doc [Args received: All = {all}, ItemKind = {:?}", item
+                    "Print all instances of item from doc [Args received: All = {all}, ItemKind = {:?}, crate = {:?}", item, package
                 )
             } else {
                 todo!(
-                    "Print all instances of item from doc [Args received: All = {all}, ItemKind = {:?}, name = {}", item, name.unwrap().to_lowercase()
+                    "Print all instances of item from doc [Args received: All = {all}, ItemKind = {:?}, name = {}, crate = {}",
+                    item,
+                    name.unwrap().to_lowercase(),
+                    package.unwrap().to_lowercase()
                 )
             }
         }
