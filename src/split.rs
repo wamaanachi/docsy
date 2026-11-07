@@ -21,20 +21,28 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
     ])
     .split(frame.area());
 
-    let results = List::new([
-        "SearchResult",
-        "DocItem",
-        "ItemKind",
-    ])
-    .block(
-        Block::bordered()
-        .title("Results")
-        .title_bottom("Tab focus | s view")
-        .border_style(border_style(app.focus == Focus::Results)),
-    )
-    .highlight_style(Style::new().bg(Color::Cyan).fg(Color::Black));
+    let query = app.input.to_lowercase();
 
-    let mut state = ListState::default().with_selected(Some(app.selected));
+    // turned into a vector cause it is easy like this
+    // and this is so that the search thing actually works
+    // and umm used some docs for this code
+    let items: Vec<&str> = ["SearchResults", "DocItem", "ItemKind"]
+        .into_iter()
+        .filter(|item| item.to_lowercase().contains(query.as_str()))
+        .collect();
+    let selected = app.selected.min(items.len().saturating_sub(1));
+
+    let results = List::new(items)
+        .block(
+            Block::bordered()
+                .title("Results")
+                .title_bottom("Tab focus | s view")
+                .border_style(border_style(app.focus == Focus::Results)),
+        )
+        .highlight_style(Style::new().bg(Color::Cyan).fg(Color::Black));
+
+    let mut state = ListState::default().with_selected(Some(selected));
+    
 
     frame.render_stateful_widget(results, areas[0], &mut state);
 
