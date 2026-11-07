@@ -1,6 +1,6 @@
 use ratatui::layout::{Constraint, Layout};
 use ratatui::style::{Color, Style};
-use ratatui::widgets::{Block, List, Paragraph, ListState};
+use ratatui::widgets::{Block, List, Paragraph, ListState, Wrap};
 use ratatui::Frame;
 
 use crate::app::{App, Focus};
@@ -68,7 +68,8 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
         Block::bordered()
             .title(doc_title)
             .border_style(border_style(app.focus == Focus::Document)),)
-            .scroll((app.scroll, 0));
+            .scroll((app.scroll, 0))
+            .wrap(Wrap {trim: true});
 
     
     frame.render_widget(document, areas[1]);
