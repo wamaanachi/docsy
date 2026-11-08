@@ -7,6 +7,7 @@ pub(crate) fn parse() -> std::io::Result<()> {
 
     // Parse commands no need to parse flags just yet
     let command = args.command;
+    
     if command.is_some() {
         parse_subcommand(command.unwrap()).expect("picnicking");
     }

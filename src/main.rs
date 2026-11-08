@@ -5,14 +5,23 @@ use crate::cli::CliArgs;
 
 mod ui;
 mod app;
+mod cli;
+mod docs;
+mod models;
+mod parser;
 mod search;
 mod split;
+mod ui;
 
 pub mod cli;
 pub mod models;
 pub mod parser;
 mod check;
 
+use app::App;
+use crossterm::event::{self, Event};
+use ratatui::DefaultTerminal;
+use std::io;
 
 fn main() -> std::io::Result<()> {
     if CliArgs::parse().is_none() {
@@ -26,22 +35,22 @@ fn main() -> std::io::Result<()> {
 
 
 fn draw_app() -> std::io::Result<()> {
-    let mut app = app::App::new();
+    // Default `cargo run`: launch the TUI!
+    let mut terminal = ratatui::init();
+    let mut app = App::new();
 
-    ratatui::run(|terminal| {
-        loop {
-            terminal.draw(|frame| ui::draw(frame, &app))?;
+    loop {
+        terminal.draw(|frame| ui::draw(frame, &mut app))?;
 
-            if let crossterm::event::Event::Key(key) = crossterm::event::read()? {
-                if key.kind == KeyEventKind::Release {
-                    continue;
-                }
+        if let Event::Key(key) = event::read()? {
+            if key.kind == crossterm::event::KeyEventKind::Press {
                 if app.handle_key(key.code) {
-                    break Ok::<(), std::io::Error>(());
+                    break;
                 }
             }
         }
-    }).expect("picnicing");
+    }
 
+    ratatui::restore();
     Ok(())
 }
