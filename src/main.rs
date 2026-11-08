@@ -1,6 +1,5 @@
 use crate::cli::parse::parse;
 use crossterm::event::KeyEventKind;
-use check::CrateCheck;
 
 mod ui;
 mod app;
