@@ -29,7 +29,7 @@ fn draw_pager(frame: &mut Frame<'_>, app: &App){
     );
 
     frame.render_widget(
-        Paragraph::new(" j/k scroll  s split  q quit"),
+        Paragraph::new(" j/k scroll  n/p next/previous  s split  q quit"),
         rows[1],
     );
 

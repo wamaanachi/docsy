@@ -6,6 +6,8 @@ use ratatui::Frame;
 use crate::app::{App, Focus};
 use crate::models::DocItem;
 
+// this file was so wierd, editied this like a milliojn times
+
 fn border_style(focused: bool) -> Style {
     if focused {
         Style::new().fg(Color::Cyan)

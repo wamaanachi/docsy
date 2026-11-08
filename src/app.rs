@@ -66,8 +66,17 @@ impl App {
                     self.scroll = self.scroll.saturating_add(1);
                 }
             }
-            
-        
+            //  this is to go to next/previous topic's documentations
+        KeyCode::Char('n') => {
+            self.selected = (self.selected + 1).min(self.docs.len().saturating_sub(1));
+            self.scroll = 0;
+        }
+
+        KeyCode::Char('p') => {
+            self.selected = self.selected.saturating_sub(1);
+            self.scroll  = 0;
+        }
+
         KeyCode::Char('s') => self.split_view = !self.split_view,
         KeyCode::Tab => {
             self.focus = match self.focus {
