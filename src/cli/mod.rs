@@ -1,4 +1,5 @@
 pub mod parse;
+pub mod commands;
 
 use clap::{Parser, Subcommand};
 use crate::models::ItemKind;
