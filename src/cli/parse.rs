@@ -1,41 +1,34 @@
-use std::process::{exit, Command, ExitStatus};
 use clap::{Parser};
-use crate::cli::{CliArgs, SubCommand};
+use crate::cli::{commands, CliArgs, SubCommand};
 
 
 pub(crate) fn parse() -> std::io::Result<()> {
     let args:CliArgs = CliArgs::parse();
 
-    // Parse flags first
-    parse_flags(args.clone());
-
-
-    // Parse commands next
+    // Parse commands no need to parse flags just yet
     let command = args.command;
     if command.is_some() {
-        parse_subcommand(command.unwrap());
+        parse_subcommand(command.unwrap()).expect("picnicking");
     }
 
     Ok(())
 }
 
 
-fn parse_subcommand(command: SubCommand) {
+fn parse_subcommand(command: SubCommand) -> std::io::Result<()> {
+    let _package: String;
+
     match command {
         SubCommand::Get { all, item, name, package } => {
-            let _package: String;
-            if package.is_some() {
-                _package = package.unwrap();
+            if package.is_none() {
+                _package = crate::check::CrateCheck::new().check_crate_name().unwrap();
             } else {
-                _package = String::from("");
+                _package = package.unwrap();
             }
 
             if all {
-                todo!(
-                    "Print all instances of item from doc \n[\n  Args received:\n    All = {all},\n    ItemKind = {:?},\n    crate = {:?}\n]",
-                    item,
-                    _package
-                )
+                commands::show_all_instances(item, _package).expect("picnic");
+                Ok(())
             } else {
                 todo!(
                     "Print all instances of item from doc \n[\n  Args received:\n    All = {all},\n    ItemKind = {:?},\n    name = {},\n    crate = {}\n]",
@@ -46,9 +39,16 @@ fn parse_subcommand(command: SubCommand) {
             }
         }
         SubCommand::List => {
-            todo!(
-                "Wire this to print every instance of every thing in the doc"
-            )
+            _package = crate::check::CrateCheck::new().check_crate_name().unwrap();
+
+            let things: Vec<(String, String)> = commands::find_all(_package.clone());
+
+            println!("{} Things found in {_package}", things.len());
+            for (name, href) in things {
+                println!("- {}", name);
+            };
+
+            Ok(())
 
             // Like this:
             //
@@ -64,36 +64,8 @@ fn parse_subcommand(command: SubCommand) {
             )
         }
         SubCommand::Generate { path: dir } => {
-            generate_docs(dir)
+            commands::generate_docs(dir);
+            Ok(())
         }
-    }
-}
-
-
-fn parse_flags(args: CliArgs) {
-    if args.path.is_some() {
-        todo!(
-            "To path tweakery with this"
-        )
-    }
-}
-
-
-fn generate_docs(dir: Option<String>) {
-    let status: ExitStatus;
-    if dir.is_some() {
-        status = Command::new("cargo")
-            .arg("doc")
-            .current_dir(dir.unwrap())
-            .status()
-            .expect("Something went wrong");
-    } else {
-        status = Command::new("cargo")
-            .arg("doc")
-            .status()
-            .expect("Something went wrong");
-    }
-    if !status.success() {
-        exit(status.code().unwrap_or(1));
     }
 }
