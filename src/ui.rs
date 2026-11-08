@@ -8,7 +8,7 @@ use crate::split;
 
 // will use https://ratatui.rs/ for studying stuff for this project 
 
-fn draw_pager(frame: &mut Frame<'_>, app: &App){
+fn draw_pager(frame: &mut Frame<'_>, app: &mut App){
 
     let hits = app.hits();
 
@@ -35,19 +35,20 @@ fn draw_pager(frame: &mut Frame<'_>, app: &App){
 
     let rows = Layout::vertical([Constraint::Min(0), Constraint::Length(1)]).split(frame.area());
 
-    frame.render_widget(
-        Paragraph::new(text).wrap(Wrap {trim: false}).scroll((app.scroll, 0)),
-        rows[0],
-    );
+    let page = Paragraph::new(text).wrap(Wrap {trim: false});
+    app.max_scroll = page.line_count(rows[0].width).saturating_sub(rows[0].height as usize) as u16;
+    app.scroll = app.scroll.min(app.max_scroll);
+
+    frame.render_widget(page.scroll((app.scroll, 0)), rows[0]);
 
     frame.render_widget(
-        Paragraph::new(" j/k scroll  n/p next/previous  s split  q quit"),
+        Paragraph::new(" j/k scroll  g/G top/bottom  n/p next/previous  s split  q quit"),
         rows[1],
     );
 
 }
 
-pub fn draw(frame: &mut ratatui::Frame<'_>, app: &App){
+pub fn draw(frame: &mut ratatui::Frame<'_>, app: &mut App){
 
     if app.split_view {
         split::draw_split(frame, app);        

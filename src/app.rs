@@ -9,6 +9,7 @@ pub enum Focus {
 
 pub struct App {
     pub scroll: u16,
+    pub max_scroll: u16,
     pub searching: bool,
     pub input: String,
     pub split_view: bool,
@@ -21,6 +22,7 @@ impl App {
     pub fn new() -> Self {
         Self {
             scroll: 0,
+            max_scroll: 0,
             searching: false,
             input: String::new(),
             split_view: false,
@@ -87,6 +89,10 @@ impl App {
             self.selected = self.selected.saturating_sub(1);
             self.scroll  = 0;
         }
+            // so this is to like go to the end and go to the top
+            // using g and G because thats how rusty-man do it /i think
+        KeyCode::Home | KeyCode::Char('g') => self.scroll = 0,
+        KeyCode::End | KeyCode::Char('G') => self.scroll = self.max_scroll,
 
         KeyCode::Char('s') => self.split_view = !self.split_view,
         KeyCode::Tab => {

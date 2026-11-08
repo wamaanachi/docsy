@@ -19,7 +19,7 @@ fn main() -> std::io::Result<()> {
 
     ratatui::run(|terminal|{
         loop {
-        terminal.draw(|frame| ui::draw(frame, &app))?;
+        terminal.draw(|frame| ui::draw(frame, &mut app))?;
 
         if let crossterm::event::Event::Key(key) = crossterm::event::read()?{
             if key.kind == KeyEventKind::Release {

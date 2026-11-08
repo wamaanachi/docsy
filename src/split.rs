@@ -17,7 +17,7 @@ fn border_style(focused: bool) -> Style {
     }
 }
 
-pub fn draw_split(frame: &mut Frame<'_>, app: &App){
+pub fn draw_split(frame: &mut Frame<'_>, app: &mut App){
 
     let rows = Layout::vertical([Constraint::Min(0), Constraint::Length(1)])
     .split(frame.area());
@@ -79,17 +79,21 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
         })
             .unwrap_or_default();
 
-    let document = Paragraph::new(text) 
+    let mut document = Paragraph::new(text) 
     .block(
         Block::bordered()
             .title(doc_title)
             .border_style(border_style(app.focus == Focus::Document)),)
-            .scroll((app.scroll, 0))
             .wrap(Wrap {trim: false});
+
+    app.max_scroll = document.line_count(areas[1].width.saturating_sub(2)).saturating_sub(areas[1].height as usize) as u16;
+    app.scroll = app.scroll.min(app.max_scroll);
+
+    document = document.scroll((app.scroll, 0));
 
     
     frame.render_widget(document, areas[1]);
 
-    let footer = Paragraph::new(" Tab switch  / filter  j/k scroll  s view  q quit");
+    let footer = Paragraph::new(" Tab switch  / filter  j/k scroll  g/G top/bottom  s view  q quit");
     frame.render_widget(footer, rows[1]);
 }
