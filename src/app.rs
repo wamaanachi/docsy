@@ -30,6 +30,15 @@ impl App {
         }
     }
 
+    pub fn hits(&self) -> Vec<&DocItem> {
+        let query = self.input.to_lowercase();
+
+        self.docs
+            .iter()
+            .filter(|doc| doc.name.to_lowercase().contains(&query))
+            .collect()
+    }
+
     pub fn handle_key(&mut self, key: KeyCode) -> bool {
         // umm so these are for the search box thingy
         if self.searching {
@@ -41,6 +50,8 @@ impl App {
             }
             return false;
         }
+
+        let len = self.hits().len();
 
         match key {
             KeyCode::Char('/') => {
@@ -59,7 +70,7 @@ impl App {
         
             KeyCode::Down | KeyCode::Char('j') => {
                 if self.split_view && self.focus == Focus::Results {
-                    self.selected = (self.selected + 1).min(self.docs.len().saturating_sub(1));
+                    self.selected = (self.selected + 1).min(len.saturating_sub(1));
                     self.scroll = 0;
                 }
                 else {
@@ -68,7 +79,7 @@ impl App {
             }
             //  this is to go to next/previous topic's documentations
         KeyCode::Char('n') => {
-            self.selected = (self.selected + 1).min(self.docs.len().saturating_sub(1));
+            self.selected = (self.selected + 1).min(len.saturating_sub(1));
             self.scroll = 0;
         }
 

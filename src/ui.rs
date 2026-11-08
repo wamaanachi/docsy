@@ -10,7 +10,10 @@ use crate::split;
 
 fn draw_pager(frame: &mut Frame<'_>, app: &App){
 
-    let Some(doc) = app.docs.get(app.selected) else {
+    let hits = app.hits();
+
+    let Some(doc) = hits.get(app.selected.min(hits.len().saturating_sub(1))) 
+    else {
         return;
     };
 
