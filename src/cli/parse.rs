@@ -18,7 +18,7 @@ fn parse_subcommand(command: SubCommand) -> std::io::Result<()> {
     let _package: String;
 
     match command {
-        SubCommand::Get { all, item, name, package } => {
+        SubCommand::Get { all, item, package, .. } => {
             if package.is_none() {
                 _package = crate::check::CrateCheck::new().check_crate_name().unwrap();
             } else {
