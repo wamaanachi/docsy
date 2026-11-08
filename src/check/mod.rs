@@ -1,6 +1,8 @@
 use std::io::Error;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use cargo_toml::Manifest;
+use clap::Parser;
+use crate::cli::CliArgs;
 
 pub(crate) struct CrateCheck {
     dir: PathBuf,
@@ -8,14 +10,15 @@ pub(crate) struct CrateCheck {
 
 impl CrateCheck {
     pub(crate) fn new() -> Self {
-        Self {
-            dir: std::env::current_dir().unwrap(),
-        }
-    }
+        let dir: PathBuf = if CliArgs::parse().path.is_some() {
+            PathBuf::from(Path::new(&CliArgs::parse().path.unwrap()))
+        } else {
+            std::env::current_dir().unwrap()
+        };
 
-    fn dir(mut self, dir: String) -> PathBuf {
-        self.dir = PathBuf::from(dir);
-        self.dir
+        Self {
+            dir
+        }
     }
 
     /// Checks if the current directory is an active rust repo
@@ -43,7 +46,7 @@ impl CrateCheck {
     pub(crate) fn check_crate_name(&self) -> Result<String, Box<dyn std::error::Error>> {
         match self.directory() {
             Err(_) => {
-                return Err(Box::new(Error::new(std::io::ErrorKind::NotFound, "Cargo.toml")));
+                return Err(Box::new(Error::new(std::io::ErrorKind::NotFound, "Cargo.toml not found")));
             }
             Ok(_) => {}
         }
@@ -55,6 +58,22 @@ impl CrateCheck {
             Ok(name)
         } else {
             Err(Box::new(Error::new(std::io::ErrorKind::NotFound, "Package Name")))
+        }
+    }
+
+    /// Checks if package given is in target/doc
+    pub(crate) fn check_package(&self, package: &str) -> Result<bool, Box<dyn std::error::Error>> {
+        match self.directory() {
+            Err(_) => {
+                return Err(Box::new(Error::new(std::io::ErrorKind::NotFound, "Cargo.toml cant be seen")));
+            }
+            Ok(_) => {}
+        }
+
+        if self.dir.join("target/doc").join(package).exists() {
+            Ok(true)
+        } else {
+            Ok(false)
         }
     }
 }
