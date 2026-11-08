@@ -1,5 +1,7 @@
+use clap::Parser;
 use crate::cli::parse::parse;
 use crossterm::event::KeyEventKind;
+use crate::cli::CliArgs;
 
 mod ui;
 mod app;
@@ -13,8 +15,17 @@ mod check;
 
 
 fn main() -> std::io::Result<()> {
-    parse();
+    if CliArgs::parse().is_none() {
+        draw_app()?
+    } else {
+        parse()?
+    }
 
+    Ok(())
+}
+
+
+fn draw_app() -> std::io::Result<()> {
     let mut app = app::App::new();
 
     ratatui::run(|terminal| {
@@ -26,9 +37,11 @@ fn main() -> std::io::Result<()> {
                     continue;
                 }
                 if app.handle_key(key.code) {
-                    break Ok(());
+                    break Ok::<(), std::io::Error>(());
                 }
             }
         }
-    })
+    }).expect("picnicing");
+
+    Ok(())
 }

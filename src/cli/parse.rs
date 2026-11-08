@@ -3,7 +3,7 @@ use clap::{Parser};
 use crate::cli::{CliArgs, SubCommand};
 
 
-pub(crate) fn parse() {
+pub(crate) fn parse() -> std::io::Result<()> {
     let args:CliArgs = CliArgs::parse();
 
     // Parse flags first
@@ -15,8 +15,8 @@ pub(crate) fn parse() {
     if command.is_some() {
         parse_subcommand(command.unwrap());
     }
-    
-    return;
+
+    Ok(())
 }
 
 

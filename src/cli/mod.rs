@@ -46,3 +46,13 @@ pub(crate) enum SubCommand {
         path: Option<String>,
     }
 }
+
+
+impl CliArgs {
+    pub(crate) fn is_none(&self) -> bool {
+        if self.path.is_none() && self.command.is_none() {
+            return true
+        }
+        false
+    }
+}
