@@ -180,21 +180,21 @@ fn parse_doc_html(html: &str) -> Option<DocItem> {
 
 
 pub(crate) fn get_kind(text: &str) -> ItemKind {
-    let kind = if text.starts_with("Struct") {
+    let kind = if text.starts_with("struct") {
         ItemKind::Struct
-    } else if text.starts_with("Module") {
+    } else if text.starts_with("module") {
         ItemKind::Module
-    } else if text.starts_with("Enum") {
+    } else if text.starts_with("enum") {
         ItemKind::Enum
-    } else if text.starts_with("Trait") {
+    } else if text.starts_with("trait") {
         ItemKind::Trait
-    } else if text.starts_with("Function") || text.starts_with("Fn") {
+    } else if text.starts_with("function") || text.starts_with("fn") {
         ItemKind::Function
-    } else if text.starts_with("Macro") {
+    } else if text.starts_with("macro") {
         ItemKind::Macro
-    } else if text.starts_with("Constant") {
+    } else if text.starts_with("constant") {
         ItemKind::Constant
-    } else if text.starts_with("Type Alias") {
+    } else if text.starts_with("type alias") {
         ItemKind::TypeAlias
     } else {
         ItemKind::Other
