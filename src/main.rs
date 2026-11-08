@@ -14,15 +14,6 @@ mod check;
 
 
 fn main() -> std::io::Result<()> {
-    let package_name: String;
-
-    match CrateCheck::new().directory() {
-        Ok(_) => {}
-        Err(e) => {
-            eprintln!("{}", e);
-        }
-    }
-
     parse();
 
     let mut app = app::App::new();
