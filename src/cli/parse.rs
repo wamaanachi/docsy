@@ -1,6 +1,6 @@
-use std::process::{exit, Command, ExitCode, ExitStatus};
-use clap::Parser;
 use crate::cli::{CliArgs, SubCommand};
+use clap::Parser;
+use std::process::{Command, ExitCode, ExitStatus, exit};
 
 pub(crate) fn parse() {
     let args = CliArgs::parse();
@@ -11,18 +11,19 @@ pub(crate) fn parse() {
         SubCommand::Get { all, item, name } => {
             if all {
                 todo!(
-                    "Print all instances of item from doc [Args received: All = {all}, ItemKind = {:?}", item
+                    "Print all instances of item from doc [Args received: All = {all}, ItemKind = {:?}",
+                    item
                 )
             } else {
                 todo!(
-                    "Print all instances of item from doc [Args received: All = {all}, ItemKind = {:?}, name = {}", item, name.unwrap().to_lowercase()
+                    "Print all instances of item from doc [Args received: All = {all}, ItemKind = {:?}, name = {}",
+                    item,
+                    name.unwrap().to_lowercase()
                 )
             }
         }
         SubCommand::List => {
-            todo!(
-                "Wire this to print every instance of every thing in the doc"
-            )
+            todo!("Wire this to print every instance of every thing in the doc")
 
             // Like this:
             //
@@ -37,12 +38,9 @@ pub(crate) fn parse() {
                 "Parse this query or do smth else, change or remove this whole thing.\n Query: {query}"
             )
         }
-        SubCommand::Generate { path: dir } => {
-            generate_docs(dir)
-        }
+        SubCommand::Generate { path: dir } => generate_docs(dir),
     }
 }
-
 
 fn generate_docs(dir: Option<String>) {
     let status: ExitStatus;
