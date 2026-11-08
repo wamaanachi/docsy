@@ -51,8 +51,7 @@ pub struct DocItem {
     pub kind: ItemKind,
     //The code declaration signature like pub struct Vec<T>
     pub declaration: String,
-    //The real stuff
+    //The real stuff, it also includes examples now
     pub description: Vec<DocBlock>,
-    //Any code examples that might get extracted from docs
-    pub examples: Vec<String>,
+    pub methods: Vec<MethodItem>,
 }

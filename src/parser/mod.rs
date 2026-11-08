@@ -161,6 +161,7 @@ pub fn parse_doc_html(html: &str) -> Option<DocItem> {
     let decl = extract_decl(html)?;
     let mod_path = extract_mod_path(html)?;
     let description = extract_docblock(html);
+    let methods = extract_method(html);
 
     let full_path = format!("{}::{}", mod_path, name);
 
@@ -170,7 +171,7 @@ pub fn parse_doc_html(html: &str) -> Option<DocItem> {
         kind,
         declaration: decl,
         description,
-        examples: Vec::new(),
+        methods,
     })
 }
 
