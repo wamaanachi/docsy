@@ -1,13 +1,24 @@
 use std::process::{exit, Command, ExitStatus};
-use clap::Parser;
+use clap::{Parser};
 use crate::cli::{CliArgs, SubCommand};
 
 
 pub(crate) fn parse() {
     let args = CliArgs::parse();
 
-    let command = args.command;
+    // Parse flags first
+    parse_flags(args.clone());
 
+
+    // Parse commands next
+    let command = args.command;
+    if command.is_some() {
+        parse_subcommand(command.unwrap());
+    }
+}
+
+
+fn parse_subcommand(command: SubCommand) {
     match command {
         SubCommand::Get { all, item, name, package } => {
             if all {
@@ -44,6 +55,15 @@ pub(crate) fn parse() {
         SubCommand::Generate { path: dir } => {
             generate_docs(dir)
         }
+    }
+}
+
+
+fn parse_flags(args: CliArgs) {
+    if args.path.is_some() {
+        todo!(
+            "To path tweakery with this"
+        )
     }
 }
 
