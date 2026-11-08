@@ -14,12 +14,20 @@ fn draw_pager(frame: &mut Frame<'_>, app: &App){
         return;
     };
 
-    let text = format!(
+    let mut text = format!(
         "{}\n\n{}\n\n{}",
         doc.path,
         doc.declaration,
          crate::docs::text(&doc.description)
     );
+
+    for method in &doc.methods {
+        text.push_str(&format!(
+            "\n\n{}\n{}",
+            method.signature,
+            crate::docs::text(&method.description)
+        ));
+    }
 
     let rows = Layout::vertical([Constraint::Min(0), Constraint::Length(1)]).split(frame.area());
 

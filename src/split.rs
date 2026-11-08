@@ -65,6 +65,13 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
         .map(|doc| format!("{}\n\n{}", doc.declaration, crate::docs::text(&doc.description)))
         .unwrap_or_default();
 
+        for method in &doc.methods {
+            text.push_str(&format!(
+                "\n\n{}\n{}",
+                method.signature,
+                crate::docs::text(&method.description)
+            ));
+        }
     let document = Paragraph::new(text) 
     .block(
         Block::bordered()
