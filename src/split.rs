@@ -85,7 +85,7 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
             .title(doc_title)
             .border_style(border_style(app.focus == Focus::Document)),)
             .scroll((app.scroll, 0))
-            .wrap(Wrap {trim: true});
+            .wrap(Wrap {trim: false});
 
     
     frame.render_widget(document, areas[1]);

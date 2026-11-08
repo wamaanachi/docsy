@@ -33,7 +33,7 @@ fn draw_pager(frame: &mut Frame<'_>, app: &App){
     let rows = Layout::vertical([Constraint::Min(0), Constraint::Length(1)]).split(frame.area());
 
     frame.render_widget(
-        Paragraph::new(text).wrap(Wrap {trim: true}).scroll((app.scroll, 0)),
+        Paragraph::new(text).wrap(Wrap {trim: false}).scroll((app.scroll, 0)),
         rows[0],
     );
 

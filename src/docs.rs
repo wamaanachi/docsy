@@ -21,7 +21,8 @@ pub fn text(blocks: &[DocBlock]) -> String {
     blocks
         .iter()
         .map(|block| match block {
-            DocBlock::Heading(text) => format!("# {text}"),
+            // gonna style this shi some more
+            DocBlock::Heading(text) => format!("{}\n{}", text.to_uppercase(), "-".repeat(text.len())),
             DocBlock::Code(text) => format!("    {text}"),
             DocBlock::Paragraph(text) => text.clone(),
         })
