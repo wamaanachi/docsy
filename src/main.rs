@@ -1,34 +1,42 @@
-use crate::cli::parse::parse;
-use crossterm::event::KeyEventKind;
-
-mod ui;
 mod app;
+mod cli;
+mod docs;
+mod models;
+mod parser;
 mod search;
 mod split;
-mod docs;
+mod ui;
 
-pub mod cli;
-pub mod models;
-pub mod parser;
+use app::App;
+use crossterm::event::{self, Event};
+use ratatui::DefaultTerminal;
+use std::io;
 
-fn main() -> std::io::Result<()> {
+fn main() -> io::Result<()> {
+    let args: Vec<String> = std::env::args().collect();
 
-        parse();
+    // If someone explicitly runs subcommands (Amaan's area), route to CLI
+    if args.len() > 1 {
+        cli::parse::parse();
+        return Ok(());
+    }
 
-    let mut app = app::App::new();
+    // Default `cargo run`: launch the TUI!
+    let mut terminal = ratatui::init();
+    let mut app = App::new();
 
-    ratatui::run(|terminal|{
-        loop {
+    loop {
         terminal.draw(|frame| ui::draw(frame, &mut app))?;
 
-        if let crossterm::event::Event::Key(key) = crossterm::event::read()?{
-            if key.kind == KeyEventKind::Release {
-                continue;
+        if let Event::Key(key) = event::read()? {
+            if key.kind == crossterm::event::KeyEventKind::Press {
+                if app.handle_key(key.code) {
+                    break;
+                }
             }
-            if app.handle_key(key.code){
-                break Ok(());
-            }
-        }   
+        }
     }
-})
+
+    ratatui::restore();
+    Ok(())
 }
