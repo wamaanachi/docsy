@@ -90,7 +90,7 @@ pub(crate) fn show_one(package: String, item_href: String) -> Result<(), Box<dyn
 }
 
 
-// --- SHOW SPECIFIC ---
+// --- SPECIFICS ---
 pub(crate) fn show_all_instances(item: ItemKind, package: String) -> Result<(), Box<dyn std::error::Error>> {
     let elements: Vec<(String, String)> = find_all(package);
     let mut specific_elements: Vec<(String, String)> = Vec::new();
@@ -106,8 +106,153 @@ pub(crate) fn show_all_instances(item: ItemKind, package: String) -> Result<(), 
     let count = specific_elements.len();
     println!("{count} Number of {item:?} FOUND!");
 
-    for (name, href) in specific_elements {
+    for (name, _href) in specific_elements {
         println!("- {name}")
+    }
+
+    Ok(())
+}
+
+
+pub(crate) fn classify(things: Vec<(String, String)>) -> Result<(), Box<dyn std::error::Error>> {
+    // pub enum ItemKind {
+    //     Module,
+    //     Struct,
+    //     Enum,
+    //     Trait,
+    //     Function,
+    //     TypeAlias,
+    //     Macro,
+    //     Constant,
+    //     Other,
+    // }
+
+    let mut module_things: Vec<(String, String)> = Vec::new();
+    let mut struct_things: Vec<(String, String)> = Vec::new();
+    let mut enum_things: Vec<(String, String)> = Vec::new();
+    let mut trait_things: Vec<(String, String)> = Vec::new();
+    let mut function_things: Vec<(String, String)> = Vec::new();
+    let mut type_things: Vec<(String, String)> = Vec::new();
+    let mut macro_things: Vec<(String, String)> = Vec::new();
+    let mut const_things: Vec<(String, String)> = Vec::new();
+    let mut other_things: Vec<(String, String)> = Vec::new();
+
+    for (name, href) in things {
+        let kind = crate::parser::get_kind(&href.split('/').last().unwrap());
+
+        println!("{href} is a {kind:?}");
+
+        match kind {
+            ItemKind::Module => {
+                module_things.push((name, href));
+            }
+            ItemKind::Enum => {
+                enum_things.push((name, href));
+            }
+            ItemKind::Struct => {
+                struct_things.push((name, href));
+            }
+            ItemKind::Trait => {
+                trait_things.push((name, href));
+            }
+            ItemKind::Function => {
+                function_things.push((name, href));
+            }
+            ItemKind::TypeAlias => {
+                type_things.push((name, href));
+            }
+            ItemKind::Macro => {
+                macro_things.push((name, href));
+            }
+            ItemKind::Constant => {
+                const_things.push((name, href));
+            }
+            ItemKind::Other => {
+                other_things.push((name, href));
+            }
+        }
+    }
+
+    if module_things.len() > 0 {
+        module_things.sort_by(|a, b| a.0.cmp(&b.0));
+
+        println!("{} Modules found:", module_things.len());
+        for (name, _href) in module_things {
+            println!("- {name}")
+        }
+        println!()
+    }
+    if struct_things.len() > 0 {
+        struct_things.sort_by(|a, b| a.0.cmp(&b.0));
+
+        println!("{} Structs found:", struct_things.len());
+        for (name, _href) in struct_things {
+            println!("- {name}")
+        }
+        println!()
+    }
+    if enum_things.len() > 0 {
+        enum_things.sort_by(|a, b| a.0.cmp(&b.0));
+
+        println!("{} Enums found:", enum_things.len());
+        for (name, _href) in enum_things {
+            println!("- {name}")
+        }
+        println!()
+    }
+    if trait_things.len() > 0 {
+        trait_things.sort_by(|a, b| a.0.cmp(&b.0));
+
+        println!("{} Traits found:", trait_things.len());
+        for (name, _href) in trait_things {
+            println!("- {name}")
+        }
+        println!()
+    }
+    if function_things.len() > 0 {
+        function_things.sort_by(|a, b| a.0.cmp(&b.0));
+
+        println!("{} Functions found:", function_things.len());
+        for (name, _href) in function_things {
+            println!("- {name}")
+        }
+        println!()
+    }
+    if type_things.len() > 0 {
+        type_things.sort_by(|a, b| a.0.cmp(&b.0));
+
+        println!("{} Type Aliases found:", type_things.len());
+        for (name, _href) in type_things {
+            println!("- {name}")
+        }
+        println!()
+    }
+    if macro_things.len() > 0 {
+        macro_things.sort_by(|a, b| a.0.cmp(&b.0));
+
+        println!("{} Macros found:", macro_things.len());
+        for (name, _href) in macro_things {
+            println!("- {name}")
+        }
+        println!();
+    }
+    if const_things.len() > 0 {
+        const_things.sort_by(|a, b| a.0.cmp(&b.0));
+
+        println!("{} Constant found:", const_things.len());
+        for (name, _href) in const_things {
+            println!("- {name}")
+        }
+        println!()
+    }
+    if other_things.len() > 0 {
+        other_things.sort_by(|a, b| a.0.cmp(&b.0));
+
+        println!("{} Other things found:", other_things.len());
+        for (name, _href) in other_things {
+            println!("- {name}")
+        }
+        println!()
     }
 
     Ok(())
