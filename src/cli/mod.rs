@@ -9,11 +9,11 @@ use crate::models::ItemKind;
 #[command(author, version, about, long_about = None)]
 pub(crate) struct CliArgs {
     #[arg(long)]
-    path: Option<String>,
+    pub(crate) path: Option<String>,
 
     /// Basic subcommands
     #[clap(subcommand)]
-    command: Option<SubCommand>
+    pub(crate) command: Option<SubCommand>
 }
 
 /// Basic subcommands
