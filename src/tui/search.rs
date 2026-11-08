@@ -6,7 +6,7 @@
 use ratatui::Frame;
 use tui_popup::Popup;
 
-use crate::app::App;
+use crate::tui::app::App;
 
 pub fn draw_search(frame: &mut Frame<'_>, app: &App) {
     if !app.searching {

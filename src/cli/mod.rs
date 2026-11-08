@@ -2,7 +2,7 @@ pub mod parse;
 pub mod commands;
 
 use clap::{Parser, Subcommand};
-use crate::models::ItemKind;
+use crate::parser::models::ItemKind;
 
 /// Args for the Command Line
 #[derive(Parser, Debug, Clone)]

@@ -3,7 +3,8 @@ use std::fs;
 use std::io::ErrorKind;
 use std::path::{ Path, PathBuf };
 use std::process::{exit, Command, ExitStatus};
-use crate::models::ItemKind;
+
+use crate::parser::models::ItemKind;
 
 // --- HTML PARSING STUFF ---
 pub(crate) fn find_all(package: String) -> Vec<(String, String)>{

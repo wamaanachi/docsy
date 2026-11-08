@@ -3,9 +3,9 @@ use ratatui::layout::{Constraint, Layout};
 use ratatui::style::{Color, Style};
 use ratatui::widgets::{Block, Paragraph, Wrap};
 
-use crate::app::App;
-use crate::search;
-use crate::split;
+use crate::tui::app::App;
+use crate::tui::search;
+use crate::tui::split;
 
 
 fn draw_pager(frame: &mut Frame<'_>, app: &mut App) {
@@ -30,7 +30,7 @@ fn draw_pager(frame: &mut Frame<'_>, app: &mut App) {
             doc.path,
             doc.kind,
             doc.declaration,
-            crate::docs::text(&doc.description)
+            crate::parser::docs::text(&doc.description)
         );
 
         if !doc.methods.is_empty() {
@@ -39,7 +39,7 @@ fn draw_pager(frame: &mut Frame<'_>, app: &mut App) {
                 text.push_str(&format!(
                     "  • {}\n{}\n\n",
                     method.signature,
-                    crate::docs::text(&method.description)
+                    crate::parser::docs::text(&method.description)
                 ));
             }
         }

@@ -2,18 +2,12 @@ use clap::Parser;
 use crate::cli::parse::parse;
 use crate::cli::CliArgs;
 
-pub mod app;
-pub mod docs;
-pub mod search;
-pub mod split;
-pub mod ui;
-
 pub mod cli;
-pub mod models;
 pub mod parser;
-mod check;
+pub mod check;
+pub mod tui;
 
-use app::App;
+use tui::app::App;
 use crossterm::event::{self, Event};
 
 fn main() -> std::io::Result<()> {
@@ -33,7 +27,7 @@ fn draw_app() -> std::io::Result<()> {
     let mut app = App::new();
 
     loop {
-        terminal.draw(|frame| ui::draw(frame, &mut app))?;
+        terminal.draw(|frame| tui::ui::draw(frame, &mut app))?;
 
         if let Event::Key(key) = event::read()? {
             if key.kind == crossterm::event::KeyEventKind::Press {

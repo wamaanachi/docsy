@@ -1,5 +1,6 @@
-use crate::models::{DocBlock, DocItem};
+use crate::parser::models::{DocBlock, DocItem};
 use crate::parser::parse_doc_file;
+
 use std::fs;
 use std::path::Path;
 

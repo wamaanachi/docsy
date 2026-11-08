@@ -3,8 +3,8 @@ use ratatui::style::{Color, Style};
 use ratatui::widgets::{Block, List, Paragraph, ListState, Wrap};
 use ratatui::Frame;
 
-use crate::app::{App, Focus};
-use crate::models::DocItem;
+use crate::tui::app::{App, Focus};
+use crate::parser::models::DocItem;
 
 // this file was so wierd, editied this like a milliojn times
 
@@ -64,13 +64,13 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &mut App) {
             let mut text = format!(
                 "{}\n\n{}",
                 doc.declaration,
-                crate::docs::text(&doc.description)
+                crate::parser::docs::text(&doc.description)
             );
             for method in &doc.methods {
                 text.push_str(&format!(
                     "\n\n{}\n{}",
                     method.signature,
-                    crate::docs::text(&method.description)
+                    crate::parser::docs::text(&method.description)
                 ));
             }
             text

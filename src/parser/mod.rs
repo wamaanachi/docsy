@@ -1,8 +1,11 @@
+pub mod docs;
+pub mod models;
+
 use std::{io, path::Path};
 
 use scraper::{ElementRef, Html, Selector};
 
-use crate::models::{DocBlock, DocItem, ItemKind, MethodItem};
+use models::{DocBlock, DocItem, ItemKind, MethodItem};
 
 
 /// Allows the frontend to pass only the path and parse get all info, rather than having to read the
