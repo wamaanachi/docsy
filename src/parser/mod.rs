@@ -117,7 +117,11 @@ fn parse_docblock_element(docblock: ElementRef) -> Vec<DocBlock> {
 pub fn extract_method(html: &str) -> Vec<MethodItem> {
     let frag = Html::parse_fragment(html);
     let method_selector = Selector::parse(
-    "#implementations-list details.method-toggle, div[id*='deref-methods'] details.method-toggle").unwrap();
+        "#implementations-list details.method-toggle, \
+            #trait-implementations-list details.method-toggle, \
+            div[id*='deref-methods'] details.method-toggle",
+    )
+    .unwrap();
 
     let sig_selector = Selector::parse("h4.code-header").unwrap();
     let name_selector = Selector::parse("h4.code-header a.fn").unwrap();
@@ -327,6 +331,21 @@ builder.recursive(<span class="bool-val">true</span>);</code></pre><div class="b
                 DocBlock::Heading("Examples".to_string()),
                 DocBlock::Code("use tokio::fs::DirBuilder;\n\nlet builder = DirBuilder::new();".to_string()),
             ]
+        );
+    }
+
+    #[test]
+    fn test_real_html_file() {
+        let path = std::path::Path::new("tests/fixtures/dirbuilder.html");
+
+        assert!(path.exists(), "Data file not found");
+
+        let doc = parse_doc_file(path).expect("Failed to parse real data");
+        assert_eq!(doc.name, "DirBuilder");
+        assert!(!doc.methods.is_empty());
+        println!(
+            "Successfully parsed real doc with {} methods!",
+            doc.methods.len()
         );
     }
 }
