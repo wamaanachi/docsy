@@ -1,7 +1,6 @@
 use clap::{Parser};
 use crate::cli::{commands, CliArgs, SubCommand};
 
-
 pub(crate) fn parse() -> std::io::Result<()> {
     let args:CliArgs = CliArgs::parse();
 
@@ -30,12 +29,8 @@ fn parse_subcommand(command: SubCommand) -> std::io::Result<()> {
                 commands::show_all_instances(item, _package).expect("picnic");
                 Ok(())
             } else {
-                todo!(
-                    "Print all instances of item from doc \n[\n  Args received:\n    All = {all},\n    ItemKind = {:?},\n    name = {},\n    crate = {}\n]",
-                    item,
-                    name.unwrap().to_lowercase(),
-                    _package
-                )
+                commands::classify(commands::find_all(_package)).expect("picnic");
+                Ok(())
             }
         }
         SubCommand::List => {
@@ -44,7 +39,7 @@ fn parse_subcommand(command: SubCommand) -> std::io::Result<()> {
             let things: Vec<(String, String)> = commands::find_all(_package.clone());
 
             println!("{} Things found in {_package}", things.len());
-            for (name, href) in things {
+            for (name, _href) in things {
                 println!("- {}", name);
             };
 
