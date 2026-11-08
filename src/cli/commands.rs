@@ -2,7 +2,10 @@ use scraper::{Html, Selector};
 use std::fs;
 use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
+use std::process::{exit, Command, ExitStatus};
+use crate::models::ItemKind;
 
+// --- HTML PARSING STUFF ---
 pub(crate) fn find_all(package: String) -> Vec<(String, String)>{
     let full_path = Path::new("target/doc")
         .join(package)
@@ -12,8 +15,6 @@ pub(crate) fn find_all(package: String) -> Vec<(String, String)>{
     let document = Html::parse_document(&html_content);
 
     let selector = Selector::parse("ul.all-items li a").unwrap();
-
-    println!("{:?}\n\n", selector);
 
     let mut elements: Vec<(String, String)> = Vec::new();
 
@@ -87,3 +88,49 @@ pub(crate) fn show_one(package: String, item_href: String) -> Result<(), Box<dyn
 
     Ok(())
 }
+
+
+// --- SHOW SPECIFIC ---
+pub(crate) fn show_all_instances(item: ItemKind, package: String) -> Result<(), Box<dyn std::error::Error>> {
+    let elements: Vec<(String, String)> = find_all(package);
+    let mut specific_elements: Vec<(String, String)> = Vec::new();
+
+    for (name, href) in &elements {
+        let kind = crate::parser::get_kind(href);
+
+        if kind == item {
+            specific_elements.push((name.to_string(), href.to_string()));
+        }
+    }
+
+    let count = specific_elements.len();
+    println!("{count} Number of {item:?} FOUND!");
+
+    for (name, href) in specific_elements {
+        println!("- {name}")
+    }
+
+    Ok(())
+}
+
+
+// --- GENERATE DOCS ---
+pub(crate) fn generate_docs(dir: Option<String>) {
+    let status: ExitStatus;
+    if dir.is_some() {
+        status = Command::new("cargo")
+            .arg("doc")
+            .current_dir(dir.unwrap())
+            .status()
+            .expect("Something went wrong");
+    } else {
+        status = Command::new("cargo")
+            .arg("doc")
+            .status()
+            .expect("Something went wrong");
+    }
+    if !status.success() {
+        exit(status.code().unwrap_or(1));
+    }
+}
+
