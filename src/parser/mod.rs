@@ -85,6 +85,8 @@ pub fn extract_docblock(html: &str) -> Vec<DocBlock> {
     parse_docblock_element(docblock)
 }
 
+///Parses the docblock (the thing that has description and code examples) into a vector of DocBlock
+///enum, helps a lot with rendering stuff.
 fn parse_docblock_element(docblock: ElementRef) -> Vec<DocBlock> {
     let selector = Selector::parse("p, h1, h2, h3, h4, h5, h6, div.example-wrap pre").unwrap();
 
@@ -114,6 +116,8 @@ fn parse_docblock_element(docblock: ElementRef) -> Vec<DocBlock> {
         .collect()
 }
 
+///get the info of methods on structs or enums into vector of MethodItems, which has structured way
+///info about name, signature and desctiption.
 pub fn extract_method(html: &str) -> Vec<MethodItem> {
     let frag = Html::parse_fragment(html);
     let method_selector = Selector::parse(
@@ -160,6 +164,8 @@ pub fn extract_method(html: &str) -> Vec<MethodItem> {
     methods
 }
 
+/// The Ultimate Assembler! Takes everything from all functions and wraps it into final DocItem
+/// datastrucuture.
 pub fn parse_doc_html(html: &str) -> Option<DocItem> {
     let (kind, name) = extract_kind_and_name(html)?;
     let decl = extract_decl(html)?;
@@ -179,6 +185,8 @@ pub fn parse_doc_html(html: &str) -> Option<DocItem> {
     })
 }
 
+/// Allows the frontend to pass only the path and parse get all info, rather than having to read the
+/// file and pass the text.
 pub fn parse_doc_file(path: &Path) -> io::Result<DocItem> {
     let html = std::fs::read_to_string(path).unwrap();
 

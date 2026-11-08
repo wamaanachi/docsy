@@ -23,6 +23,11 @@ pub enum ItemKind {
     Constant,
     Other,
 }
+
+///The struct which holds information about a single method,
+///It holds data like the name of the method (like send)
+///then signature of the method (pub async fn send(&self, value: T) -> Result<(), SendError<T>>)
+///and the description, with example codeblock.
 #[derive(Clone, Serialize, Deserialize, PartialEq, Eq, Debug)]
 pub struct MethodItem {
     pub name: String,
@@ -53,5 +58,6 @@ pub struct DocItem {
     pub declaration: String,
     //The real stuff, it also includes examples now
     pub description: Vec<DocBlock>,
+    /// Will have the list of all the methods applied on current thingy
     pub methods: Vec<MethodItem>,
 }
