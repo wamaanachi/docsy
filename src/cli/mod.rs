@@ -4,16 +4,19 @@ use clap::{Parser, Subcommand};
 use crate::models::ItemKind;
 
 /// Args for the Command Line
-#[derive(Parser, Debug)]
+#[derive(Parser, Debug, Clone)]
 #[command(author, version, about, long_about = None)]
 pub(crate) struct CliArgs {
+    #[arg(long)]
+    path: Option<String>,
+
     /// Basic subcommands
     #[clap(subcommand)]
-    command: SubCommand
+    command: Option<SubCommand>
 }
 
 /// Basic subcommands
-#[derive(Subcommand, Debug)]
+#[derive(Subcommand, Debug, Clone)]
 pub(crate) enum SubCommand {
     /// Outputs docs for whatever you entered
     Get {
