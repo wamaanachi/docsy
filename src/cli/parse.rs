@@ -44,20 +44,10 @@ fn parse_subcommand(command: SubCommand) -> std::io::Result<()> {
             };
 
             Ok(())
-
-            // Like this:
-            //
-            // Struct:
-            //   - SearchResult
-            //   - DocItem
-            // Enum:
-            //   - ItemKind
         }
-        SubCommand::Search { query } => {
-            todo!(
-                "Parse this query or do smth else, change or remove this whole thing.\n Query: {query}"
-            )
-        }
+        // SubCommand::Search { query } => {
+        //     to do("Parse this query or do smth else, change or remove this whole thing.\n Query: {query}")
+        // }
         SubCommand::Generate { path: dir } => {
             commands::generate_docs(dir);
             Ok(())

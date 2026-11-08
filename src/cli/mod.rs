@@ -35,10 +35,10 @@ pub(crate) enum SubCommand {
     /// Lists all things in the program
     List,
 
-    /// Search for a specific thing
-    Search {
-        query: String,
-    },
+    // /// Search for a specific thing
+    // Search {
+    //     query: String,
+    // },
 
     /// Runs cargo doc in the current directory
     Generate {
