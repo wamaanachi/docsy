@@ -1,19 +1,23 @@
 pub mod parse;
+pub mod commands;
 
 use clap::{Parser, Subcommand};
-use crate::models::ItemKind;
+use crate::parser::models::ItemKind;
 
 /// Args for the Command Line
-#[derive(Parser, Debug)]
+#[derive(Parser, Debug, Clone)]
 #[command(author, version, about, long_about = None)]
 pub(crate) struct CliArgs {
+    #[arg(long)]
+    pub(crate) path: Option<String>,
+
     /// Basic subcommands
     #[clap(subcommand)]
-    command: SubCommand
+    pub(crate) command: Option<SubCommand>
 }
 
 /// Basic subcommands
-#[derive(Subcommand, Debug)]
+#[derive(Subcommand, Debug, Clone)]
 pub(crate) enum SubCommand {
     /// Outputs docs for whatever you entered
     Get {
@@ -24,20 +28,32 @@ pub(crate) enum SubCommand {
         item: ItemKind,
         #[arg(required_unless_present = "all")]
         name: Option<String>,
+        #[arg(long="crate")]
+        package: Option<String>,
     },
 
     /// Lists all things in the program
     List,
 
-    /// Search for a specific thing
-    Search {
-        query: String,
-    },
+    // /// Search for a specific thing
+    // Search {
+    //     query: String,
+    // },
 
     /// Runs cargo doc in the current directory
     Generate {
         /// Path from terminal dir, or use full path starting from root
         /// path = "/home/user/Projects/..." or "C:\..."
         path: Option<String>,
+    }
+}
+
+
+impl CliArgs {
+    pub(crate) fn is_none(&self) -> bool {
+        if self.path.is_none() && self.command.is_none() {
+            return true
+        }
+        false
     }
 }

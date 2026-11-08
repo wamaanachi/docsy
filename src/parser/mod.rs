@@ -1,11 +1,25 @@
+pub mod docs;
+pub mod models;
+
 use std::{io, path::Path};
 
 use scraper::{ElementRef, Html, Selector};
 
-use crate::models::{DocBlock, DocItem, ItemKind, MethodItem};
+use models::{DocBlock, DocItem, ItemKind, MethodItem};
+
+
+/// Allows the frontend to pass only the path and parse get all info, rather than having to read the
+/// file and pass the text.
+pub(crate) fn parse_doc_file(path: &Path) -> io::Result<DocItem> {
+    let html = std::fs::read_to_string(path)?;
+
+    parse_doc_html(&html)
+        .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "Failed to parse rustdoc HTML"))
+}
+
 
 /// extracts the signature of the said thingy from HTML file
-pub fn extract_decl(html: &str) -> Option<String> {
+fn extract_decl(html: &str) -> Option<String> {
     let fragment = Html::parse_fragment(html);
     let selector = Selector::parse("pre.item-decl").unwrap();
 
@@ -18,7 +32,7 @@ pub fn extract_decl(html: &str) -> Option<String> {
 
 /// A kinda ugly function, which classifies text from HTML into a better enum type
 /// And yeah... it returns a tuple with (kind, name)
-pub fn extract_kind_and_name(html: &str) -> Option<(ItemKind, String)> {
+fn extract_kind_and_name(html: &str) -> Option<(ItemKind, String)> {
     let fragment = Html::parse_fragment(html);
     let selector = Selector::parse(".main-heading h1").unwrap();
 
@@ -26,25 +40,7 @@ pub fn extract_kind_and_name(html: &str) -> Option<(ItemKind, String)> {
     let text = element.text().collect::<Vec<_>>().join(" ");
     let text = text.trim();
 
-    let kind = if text.starts_with("Struct") {
-        ItemKind::Struct
-    } else if text.starts_with("Module") {
-        ItemKind::Module
-    } else if text.starts_with("Enum") {
-        ItemKind::Enum
-    } else if text.starts_with("Trait") {
-        ItemKind::Trait
-    } else if text.starts_with("Function") || text.starts_with("Fn") {
-        ItemKind::Function
-    } else if text.starts_with("Macro") {
-        ItemKind::Macro
-    } else if text.starts_with("Constant") {
-        ItemKind::Constant
-    } else if text.starts_with("Type Alias") {
-        ItemKind::TypeAlias
-    } else {
-        ItemKind::Other
-    };
+    let kind = get_kind(text);
 
     let span_selector = Selector::parse("h1 > span").ok()?;
     let span_elem = element.select(&span_selector).next()?;
@@ -56,7 +52,7 @@ pub fn extract_kind_and_name(html: &str) -> Option<(ItemKind, String)> {
 
 /// This function extracts the Path from breadcrumbs in HTML file
 /// NOT to be confused with file path, this is for import path like std::vec::Vec
-pub fn extract_mod_path(html: &str) -> Option<String> {
+fn extract_mod_path(html: &str) -> Option<String> {
     let frag = Html::parse_fragment(html);
     let bread_selector = Selector::parse(".rustdoc-breadcrumbs a").unwrap();
 
@@ -73,8 +69,9 @@ pub fn extract_mod_path(html: &str) -> Option<String> {
     }
 }
 
+
 ///extracts top-level descriptions
-pub fn extract_docblock(html: &str) -> Vec<DocBlock> {
+fn extract_docblock(html: &str) -> Vec<DocBlock> {
     let frag = Html::parse_fragment(html);
     let selector = Selector::parse("details.top-doc div.docblock").unwrap();
 
@@ -84,6 +81,7 @@ pub fn extract_docblock(html: &str) -> Vec<DocBlock> {
 
     parse_docblock_element(docblock)
 }
+
 
 ///Parses the docblock (the thing that has description and code examples) into a vector of DocBlock
 ///enum, helps a lot with rendering stuff.
@@ -116,16 +114,17 @@ fn parse_docblock_element(docblock: ElementRef) -> Vec<DocBlock> {
         .collect()
 }
 
+
 ///get the info of methods on structs or enums into vector of MethodItems, which has structured way
 ///info about name, signature and desctiption.
-pub fn extract_method(html: &str) -> Vec<MethodItem> {
+fn extract_method(html: &str) -> Vec<MethodItem> {
     let frag = Html::parse_fragment(html);
     let method_selector = Selector::parse(
         "#implementations-list details.method-toggle, \
             #trait-implementations-list details.method-toggle, \
             div[id*='deref-methods'] details.method-toggle",
     )
-    .unwrap();
+        .unwrap();
 
     let sig_selector = Selector::parse("h4.code-header").unwrap();
     let name_selector = Selector::parse("h4.code-header a.fn").unwrap();
@@ -164,9 +163,10 @@ pub fn extract_method(html: &str) -> Vec<MethodItem> {
     methods
 }
 
+
 /// The Ultimate Assembler! Takes everything from all functions and wraps it into final DocItem
 /// datastrucuture.
-pub fn parse_doc_html(html: &str) -> Option<DocItem> {
+fn parse_doc_html(html: &str) -> Option<DocItem> {
     let (kind, name) = extract_kind_and_name(html)?;
     let decl = extract_decl(html)?;
     let mod_path = extract_mod_path(html)?;
@@ -185,18 +185,34 @@ pub fn parse_doc_html(html: &str) -> Option<DocItem> {
     })
 }
 
-/// Allows the frontend to pass only the path and parse get all info, rather than having to read the
-/// file and pass the text.
-pub fn parse_doc_file(path: &Path) -> io::Result<DocItem> {
-    let html = std::fs::read_to_string(path).unwrap();
 
-    parse_doc_html(&html)
-        .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "Failed to parse rustdoc HTML"))
+pub(crate) fn get_kind(text: &str) -> ItemKind {
+    let kind = if text.starts_with("struct") {
+        ItemKind::Struct
+    } else if text.starts_with("module") {
+        ItemKind::Module
+    } else if text.starts_with("enum") {
+        ItemKind::Enum
+    } else if text.starts_with("trait") {
+        ItemKind::Trait
+    } else if text.starts_with("function") || text.starts_with("fn") {
+        ItemKind::Function
+    } else if text.starts_with("macro") {
+        ItemKind::Macro
+    } else if text.starts_with("constant") {
+        ItemKind::Constant
+    } else if text.starts_with("type alias") {
+        ItemKind::TypeAlias
+    } else {
+        ItemKind::Other
+    };
+
+    kind
 }
+
 
 #[cfg(test)]
 mod test {
-
     use super::*;
 
     #[test]
@@ -332,7 +348,7 @@ builder.recursive(<span class="bool-val">true</span>);</code></pre><div class="b
         // Sorry I used AI to generate structure for this test :sob: I don't wanna parse HTML to Vec
         // in my brain :hs:
         assert_eq!(
-          methods[0].description,
+            methods[0].description,
             vec![
                 DocBlock::Paragraph("Creates a new set of options with default mode/security settings for all\nplatforms and also non-recursive.".to_string()),
                 DocBlock::Paragraph("This is an async version of std::fs::DirBuilder::new.".to_string()),
@@ -357,3 +373,4 @@ builder.recursive(<span class="bool-val">true</span>);</code></pre><div class="b
         );
     }
 }
+

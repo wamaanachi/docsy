@@ -3,9 +3,10 @@ use ratatui::layout::{Constraint, Layout};
 use ratatui::style::{Color, Style};
 use ratatui::widgets::{Block, Paragraph, Wrap};
 
-use crate::app::App;
-use crate::search;
-use crate::split;
+use crate::tui::app::App;
+use crate::tui::search;
+use crate::tui::split;
+
 
 fn draw_pager(frame: &mut Frame<'_>, app: &mut App) {
     let rows = Layout::vertical([Constraint::Min(0), Constraint::Length(1)]).split(frame.area());
@@ -29,7 +30,7 @@ fn draw_pager(frame: &mut Frame<'_>, app: &mut App) {
             doc.path,
             doc.kind,
             doc.declaration,
-            crate::docs::text(&doc.description)
+            crate::parser::docs::text(&doc.description)
         );
 
         if !doc.methods.is_empty() {
@@ -38,7 +39,7 @@ fn draw_pager(frame: &mut Frame<'_>, app: &mut App) {
                 text.push_str(&format!(
                     "  • {}\n{}\n\n",
                     method.signature,
-                    crate::docs::text(&method.description)
+                    crate::parser::docs::text(&method.description)
                 ));
             }
         }
@@ -76,9 +77,10 @@ fn draw_pager(frame: &mut Frame<'_>, app: &mut App) {
     let footer = Paragraph::new(
         " j/k: scroll  g/G: top/bottom  n/p: next/prev doc  s: split  /: search  q: quit ",
     )
-    .style(Style::default().fg(Color::Black).bg(Color::Cyan));
+        .style(Style::default().fg(Color::Black).bg(Color::Cyan));
     frame.render_widget(footer, rows[1]);
 }
+
 
 pub fn draw(frame: &mut Frame<'_>, app: &mut App) {
     if app.split_view {

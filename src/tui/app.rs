@@ -1,4 +1,4 @@
-use crate::models::DocItem;
+use crate::parser::models::DocItem;
 use crossterm::event::KeyCode;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -29,7 +29,7 @@ impl App {
         };
 
         // Call load ONCE:
-        let docs = crate::docs::load(doc_path);
+        let docs = crate::parser::docs::load(doc_path);
 
         Self {
             scroll: 0,
