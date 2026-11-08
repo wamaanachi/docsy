@@ -8,30 +8,30 @@ use crate::app::{App, Focus};
 fn border_style(focused: bool) -> Style {
     if focused {
         Style::new().fg(Color::Cyan)
-    }
-    else {
+    } else {
         Style::new().fg(Color::DarkGray)
     }
 }
 
-pub fn draw_split(frame: &mut Frame<'_>, app: &App){
+
+pub fn draw_split(frame: &mut Frame<'_>, app: &App) {
     let areas = Layout::horizontal([
         Constraint::Percentage(30),
         Constraint::Percentage(70),
     ])
-    .split(frame.area());
+        .split(frame.area());
 
     let results = List::new([
         "SearchResult",
         "DocItem",
         "ItemKind",
     ])
-    .block(
-        Block::bordered()
-        .title("Results")
-        .title_bottom("Tab focus | s view")
-        .border_style(border_style(app.focus == Focus::Results)),
-    );
+        .block(
+            Block::bordered()
+                .title("Results")
+                .title_bottom("Tab focus | s view")
+                .border_style(border_style(app.focus == Focus::Results)),
+        );
 
     frame.render_widget(results, areas[0]);
 
@@ -43,14 +43,13 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
         .collect::<Vec<_>>()
         .join("\n");
 
-    let document = Paragraph::new(text) 
-    .block(
-        Block::bordered()
-            .title("docs")
-            .title_bottom("j/k scroll | Tab focus | / search | s view | q quit")
-            .border_style(border_style(app.focus == Focus::Document)),)
-            .scroll((app.scroll, 0));
+    let document = Paragraph::new(text)
+        .block(
+            Block::bordered()
+                .title("docs")
+                .title_bottom("j/k scroll | Tab focus | / search | s view | q quit")
+                .border_style(border_style(app.focus == Focus::Document)), )
+        .scroll((app.scroll, 0));
 
     frame.render_widget(document, areas[1]);
-
 }
