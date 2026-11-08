@@ -1,6 +1,5 @@
 use std::path::Path;
-
-use crate::models::DocItem;
+use crate::models::{DocItem, DocBlock};
 
 // complicated ahh code
 pub fn load(dir: &Path) -> Vec<DocItem> {
@@ -15,4 +14,17 @@ pub fn load(dir: &Path) -> Vec<DocItem> {
         }
     }
     docs
+}
+
+// worst code ever?
+pub fn text(blocks: &[DocBlock]) -> String {
+    blocks
+        .iter()
+        .map(|block| match block {
+            DocBlock::Heading(text) => format!("# {text}"),
+            DocBlock::Code(text) => format!("    {text}"),
+            DocBlock::Paragraph(text) => text.clone(),
+        })
+        .collect::<Vec<_>>()
+        .join("\n\n")
 }

@@ -60,7 +60,7 @@ pub fn draw_split(frame: &mut Frame<'_>, app: &App){
     //but that'd make things unnecesarily complicated
 
     let text = doc
-        .map(|doc| format!("{}\n\n{}", doc.declaration, doc.description))
+        .map(|doc| format!("{}\n\n{}", doc.declaration, crate::docs::text(&doc.description)))
         .unwrap_or_default();
 
     let document = Paragraph::new(text) 
