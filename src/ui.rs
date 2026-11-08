@@ -15,7 +15,8 @@ fn draw_pager(frame: &mut Frame<'_>, app: &App){
     };
 
     let text = format!(
-        "{}\n\n{}",
+        "{}\n\n{}\n\n{}",
+        doc.path,
         doc.declaration,
          crate::docs::text(&doc.description)
     );
