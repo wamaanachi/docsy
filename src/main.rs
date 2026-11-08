@@ -1,17 +1,12 @@
 use clap::Parser;
 use crate::cli::parse::parse;
-use crossterm::event::KeyEventKind;
 use crate::cli::CliArgs;
 
-mod ui;
-mod app;
-mod cli;
-mod docs;
-mod models;
-mod parser;
-mod search;
-mod split;
-mod ui;
+pub mod app;
+pub mod docs;
+pub mod search;
+pub mod split;
+pub mod ui;
 
 pub mod cli;
 pub mod models;
@@ -20,8 +15,6 @@ mod check;
 
 use app::App;
 use crossterm::event::{self, Event};
-use ratatui::DefaultTerminal;
-use std::io;
 
 fn main() -> std::io::Result<()> {
     if CliArgs::parse().is_none() {

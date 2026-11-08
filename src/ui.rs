@@ -7,6 +7,7 @@ use crate::app::App;
 use crate::search;
 use crate::split;
 
+
 fn draw_pager(frame: &mut Frame<'_>, app: &mut App) {
     let rows = Layout::vertical([Constraint::Min(0), Constraint::Length(1)]).split(frame.area());
 
@@ -76,9 +77,10 @@ fn draw_pager(frame: &mut Frame<'_>, app: &mut App) {
     let footer = Paragraph::new(
         " j/k: scroll  g/G: top/bottom  n/p: next/prev doc  s: split  /: search  q: quit ",
     )
-    .style(Style::default().fg(Color::Black).bg(Color::Cyan));
+        .style(Style::default().fg(Color::Black).bg(Color::Cyan));
     frame.render_widget(footer, rows[1]);
 }
+
 
 pub fn draw(frame: &mut Frame<'_>, app: &mut App) {
     if app.split_view {
@@ -88,20 +90,4 @@ pub fn draw(frame: &mut Frame<'_>, app: &mut App) {
     }
 
     search::draw_search(frame, app);
-}
-
-
-fn draw_pager(frame: &mut ratatui::Frame<'_>, app: &App) {
-    // ok so this is just to print out some random text
-    let some_random_text = (1..=60)
-        .map(|i| format!("line {i}: stuff from documentation"))
-        .collect::<Vec<_>>()
-        .join("\n");
-
-    let the_stuff = Paragraph::new(some_random_text)
-        .left_aligned()
-        .scroll((app.scroll, 0));
-
-    frame.render_widget(the_stuff, frame.area());
-
 }

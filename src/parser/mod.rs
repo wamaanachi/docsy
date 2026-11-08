@@ -66,6 +66,7 @@ fn extract_mod_path(html: &str) -> Option<String> {
     }
 }
 
+
 ///extracts top-level descriptions
 fn extract_docblock(html: &str) -> Vec<DocBlock> {
     let frag = Html::parse_fragment(html);
@@ -77,6 +78,7 @@ fn extract_docblock(html: &str) -> Vec<DocBlock> {
 
     parse_docblock_element(docblock)
 }
+
 
 ///Parses the docblock (the thing that has description and code examples) into a vector of DocBlock
 ///enum, helps a lot with rendering stuff.
@@ -109,6 +111,7 @@ fn parse_docblock_element(docblock: ElementRef) -> Vec<DocBlock> {
         .collect()
 }
 
+
 ///get the info of methods on structs or enums into vector of MethodItems, which has structured way
 ///info about name, signature and desctiption.
 fn extract_method(html: &str) -> Vec<MethodItem> {
@@ -118,7 +121,7 @@ fn extract_method(html: &str) -> Vec<MethodItem> {
             #trait-implementations-list details.method-toggle, \
             div[id*='deref-methods'] details.method-toggle",
     )
-    .unwrap();
+        .unwrap();
 
     let sig_selector = Selector::parse("h4.code-header").unwrap();
     let name_selector = Selector::parse("h4.code-header a.fn").unwrap();
@@ -156,6 +159,7 @@ fn extract_method(html: &str) -> Vec<MethodItem> {
     }
     methods
 }
+
 
 /// The Ultimate Assembler! Takes everything from all functions and wraps it into final DocItem
 /// datastrucuture.
@@ -203,9 +207,9 @@ pub(crate) fn get_kind(text: &str) -> ItemKind {
     kind
 }
 
+
 #[cfg(test)]
 mod test {
-
     use super::*;
 
     #[test]
@@ -341,7 +345,7 @@ builder.recursive(<span class="bool-val">true</span>);</code></pre><div class="b
         // Sorry I used AI to generate structure for this test :sob: I don't wanna parse HTML to Vec
         // in my brain :hs:
         assert_eq!(
-          methods[0].description,
+            methods[0].description,
             vec![
                 DocBlock::Paragraph("Creates a new set of options with default mode/security settings for all\nplatforms and also non-recursive.".to_string()),
                 DocBlock::Paragraph("This is an async version of std::fs::DirBuilder::new.".to_string()),
