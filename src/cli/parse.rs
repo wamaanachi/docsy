@@ -4,7 +4,7 @@ use crate::cli::{CliArgs, SubCommand};
 
 
 pub(crate) fn parse() {
-    let args = CliArgs::parse();
+    let args:CliArgs = CliArgs::parse();
 
     // Parse flags first
     parse_flags(args.clone());
@@ -15,22 +15,33 @@ pub(crate) fn parse() {
     if command.is_some() {
         parse_subcommand(command.unwrap());
     }
+    
+    return;
 }
 
 
 fn parse_subcommand(command: SubCommand) {
     match command {
         SubCommand::Get { all, item, name, package } => {
+            let _package: String;
+            if package.is_some() {
+                _package = package.unwrap();
+            } else {
+                _package = String::from("");
+            }
+
             if all {
                 todo!(
-                    "Print all instances of item from doc [Args received: All = {all}, ItemKind = {:?}, crate = {:?}", item, package
+                    "Print all instances of item from doc \n[\n  Args received:\n    All = {all},\n    ItemKind = {:?},\n    crate = {:?}\n]",
+                    item,
+                    _package
                 )
             } else {
                 todo!(
-                    "Print all instances of item from doc [Args received: All = {all}, ItemKind = {:?}, name = {}, crate = {}",
+                    "Print all instances of item from doc \n[\n  Args received:\n    All = {all},\n    ItemKind = {:?},\n    name = {},\n    crate = {}\n]",
                     item,
                     name.unwrap().to_lowercase(),
-                    package.unwrap().to_lowercase()
+                    _package
                 )
             }
         }
