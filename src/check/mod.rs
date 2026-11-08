@@ -7,7 +7,7 @@ pub(crate) struct CrateCheck {
 }
 
 impl CrateCheck {
-    fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {
             dir: std::env::current_dir().unwrap(),
         }
@@ -21,7 +21,7 @@ impl CrateCheck {
     /// Checks if the current directory is an active rust repo
     ///
     /// Checks for a Cargo.toml, otherwise returns error
-    fn directory(&self) -> Result<(), Box<dyn std::error::Error>> {
+    pub(crate) fn directory(&self) -> Result<(), Box<dyn std::error::Error>> {
         let current_dir: PathBuf = self.dir.clone();
 
         if !current_dir.is_dir() || !current_dir.exists() {
@@ -40,7 +40,7 @@ impl CrateCheck {
     /// Checks the name of the crate of the current dir
     ///
     /// Checks it from Cargo.toml
-    fn check_crate_name(&self) -> Result<String, Box<dyn std::error::Error>> {
+    pub(crate) fn check_crate_name(&self) -> Result<String, Box<dyn std::error::Error>> {
         match self.directory() {
             Err(_) => {
                 return Err(Box::new(Error::new(std::io::ErrorKind::NotFound, "Cargo.toml")));
