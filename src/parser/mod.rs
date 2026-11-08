@@ -37,25 +37,7 @@ fn extract_kind_and_name(html: &str) -> Option<(ItemKind, String)> {
     let text = element.text().collect::<Vec<_>>().join(" ");
     let text = text.trim();
 
-    let kind = if text.starts_with("Struct") {
-        ItemKind::Struct
-    } else if text.starts_with("Module") {
-        ItemKind::Module
-    } else if text.starts_with("Enum") {
-        ItemKind::Enum
-    } else if text.starts_with("Trait") {
-        ItemKind::Trait
-    } else if text.starts_with("Function") || text.starts_with("Fn") {
-        ItemKind::Function
-    } else if text.starts_with("Macro") {
-        ItemKind::Macro
-    } else if text.starts_with("Constant") {
-        ItemKind::Constant
-    } else if text.starts_with("Type Alias") {
-        ItemKind::TypeAlias
-    } else {
-        ItemKind::Other
-    };
+    let kind = get_kind(text);
 
     let span_selector = Selector::parse("h1 > span").ok()?;
     let span_elem = element.select(&span_selector).next()?;
@@ -194,6 +176,31 @@ fn parse_doc_html(html: &str) -> Option<DocItem> {
         description,
         methods,
     })
+}
+
+
+pub(crate) fn get_kind(text: &str) -> ItemKind {
+    let kind = if text.starts_with("Struct") {
+        ItemKind::Struct
+    } else if text.starts_with("Module") {
+        ItemKind::Module
+    } else if text.starts_with("Enum") {
+        ItemKind::Enum
+    } else if text.starts_with("Trait") {
+        ItemKind::Trait
+    } else if text.starts_with("Function") || text.starts_with("Fn") {
+        ItemKind::Function
+    } else if text.starts_with("Macro") {
+        ItemKind::Macro
+    } else if text.starts_with("Constant") {
+        ItemKind::Constant
+    } else if text.starts_with("Type Alias") {
+        ItemKind::TypeAlias
+    } else {
+        ItemKind::Other
+    };
+
+    kind
 }
 
 #[cfg(test)]
