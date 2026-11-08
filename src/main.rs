@@ -1,6 +1,6 @@
 use crate::cli::parse::parse;
 use crossterm::event::KeyEventKind;
-use crate::check::check_crate_name;
+use check::CrateCheck;
 
 mod ui;
 mod app;
@@ -16,7 +16,7 @@ mod check;
 fn main() -> std::io::Result<()> {
     let package_name: String;
 
-    match check::directory() {
+    match CrateCheck::new().directory() {
         Ok(_) => {}
         Err(e) => {
             eprintln!("{}", e);
